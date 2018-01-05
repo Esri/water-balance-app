@@ -1,3 +1,25 @@
+/*
+   Copyright 2017 Esri
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+
+   you may not use this file except in compliance with the License.
+
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+
+   distributed under the License is distributed on an "AS IS" BASIS,
+
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+
+   See the License for the specific language governing permissions and
+
+   limitations under the License.​
+*/
+
 require(["esri/graphic", "esri/geometry/Point", "esri/symbols/SimpleMarkerSymbol", "esri/symbols/SimpleLineSymbol", "esri/Color", "esri/arcgis/utils", "esri/TimeExtent", "esri/layers/MosaicRule", "esri/tasks/ImageServiceIdentifyTask", "esri/tasks/ImageServiceIdentifyParameters", "esri/dijit/Search", "esri/request", "esri/geometry/webMercatorUtils", "dojo/on", "dojo/dom-class", "dojo/_base/connect", "dojo/Deferred"], function (Graphic, Point, SimpleMarkerSymbol, SimpleLineSymbol, Color, arcgisUtils, TimeExtent, MosaicRule, ImageServiceIdentifyTask, ImageServiceIdentifyParameters, Search, esriRequest, webMercatorUtils, on, domClass, connect, Deferred) {
     // Enforce strict mode
     'use strict';
