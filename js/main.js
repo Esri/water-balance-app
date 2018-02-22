@@ -1542,11 +1542,12 @@ require(["esri/graphic", "esri/geometry/Point", "esri/symbols/SimpleMarkerSymbol
 
         var str = "data:text/csv;charset=utf-8,";
         var headers = ['Time'];
-        var timeFormatFullMonthName = d3.time.format("%Y-%B");
+        var timeFormatFullMonthName = d3.time.format("%m/%d/%Y");
 
         // get column headers
         app.mainChart.rawData.forEach(function (item, idx) {
             var header = item.key === 'ChangeInStorage' ? 'Change In Storage' : item.key;
+            header += ' (mm)';
             headers.push(header);
         });
         // set csv headers
