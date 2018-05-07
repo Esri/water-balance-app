@@ -20,12 +20,13 @@
    limitations under the License.​
 */
 
-require(["esri/graphic", "esri/geometry/Point", "esri/symbols/SimpleMarkerSymbol", "esri/symbols/SimpleLineSymbol", "esri/Color", "esri/arcgis/utils", "esri/TimeExtent", "esri/layers/MosaicRule", "esri/tasks/ImageServiceIdentifyTask", "esri/tasks/ImageServiceIdentifyParameters", "esri/dijit/Search", "esri/request", "esri/geometry/webMercatorUtils", "dojo/on", "dojo/dom-class", "dojo/_base/connect", "dojo/Deferred"], function (Graphic, Point, SimpleMarkerSymbol, SimpleLineSymbol, Color, arcgisUtils, TimeExtent, MosaicRule, ImageServiceIdentifyTask, ImageServiceIdentifyParameters, Search, esriRequest, webMercatorUtils, on, domClass, connect, Deferred) {
+require(["esri/graphic", "esri/geometry/Point", "esri/symbols/SimpleMarkerSymbol", "esri/symbols/SimpleLineSymbol", "esri/Color", "esri/arcgis/utils", "esri/TimeExtent", "esri/layers/MosaicRule", "esri/tasks/ImageServiceIdentifyTask", "esri/tasks/ImageServiceIdentifyParameters", "esri/dijit/Search", "esri/request", "esri/geometry/webMercatorUtils", "esri/layers/RasterFunction", "dojo/on", "dojo/dom-class", "dojo/_base/connect", "dojo/Deferred"], function (Graphic, Point, SimpleMarkerSymbol, SimpleLineSymbol, Color, arcgisUtils, TimeExtent, MosaicRule, ImageServiceIdentifyTask, ImageServiceIdentifyParameters, Search, esriRequest, webMercatorUtils, RasterFunction, on, domClass, connect, Deferred) {
     // Enforce strict mode
     'use strict';
 
-    var app = { "webMapID": "c132c7e396f64a11bfa1c24082bdb0c5" };
-
+    // var app = { "webMapID": "c132c7e396f64a11bfa1c24082bdb0c5" };
+    var app = { "webMapID": "70b28c8c75e5481c8334b57e6c72e671" };
+    
     //initiate the app
     arcgisUtils.createMap(app.webMapID, "mapDiv").then(function (response) {
         app.map = response.map;
@@ -144,12 +145,17 @@ require(["esri/graphic", "esri/geometry/Point", "esri/symbols/SimpleMarkerSymbol
         var deferred = new Deferred();
         var imageServiceIdentifyTask = new ImageServiceIdentifyTask(identifyTaskURL);
         var imageServiceIdentifyTaskParams = new ImageServiceIdentifyParameters();
+        var rasterFunction = new RasterFunction();  
+        rasterFunction.functionName = "None";  
+
         imageServiceIdentifyTaskParams.returnCatalogItems = true;
         imageServiceIdentifyTaskParams.returnGeometry = false;
         imageServiceIdentifyTaskParams.geometry = inputGeometry;
         imageServiceIdentifyTaskParams.mosaicRule = getMosaicRule(imageServiceTitle);
+        imageServiceIdentifyTaskParams.renderingRule = rasterFunction;
 
         imageServiceIdentifyTask.execute(imageServiceIdentifyTaskParams).then(function (response) {
+            // process the identify results if the vale is not NoData except for Snowpack layer, because there could be values for others layers but not for snowpack
             if (response.value !== "NoData" || imageServiceTitle === "Snowpack") {
                 var processedResults = processIdentifyTaskResults(response, imageServiceTitle);
                 deferred.resolve(processedResults);
@@ -164,6 +170,7 @@ require(["esri/graphic", "esri/geometry/Point", "esri/symbols/SimpleMarkerSymbol
     }
 
     function processIdentifyTaskResults(results, imageServiceTitle) {
+        // console.log('calling processIdentifyTaskResults for ' + imageServiceTitle, results);
         var processedResults = {
             "key": imageServiceTitle,
             "values": []
@@ -215,13 +222,30 @@ require(["esri/graphic", "esri/geometry/Point", "esri/symbols/SimpleMarkerSymbol
                 };
             });
         }
+        // console.log('processedResults', processedResults);
         return processedResults;
     }
 
     function getMosaicRule(imageServiceTitle) {
         var mosaicRule = new MosaicRule();
+        var mdDef = getMultidimensionalDefinition(imageServiceTitle);
+        
         mosaicRule.where = "tag = 'Composite'";
+        mosaicRule.ascending = false;
+        if(mdDef){
+            mosaicRule.multidimensionalDefinition = [{"variableName": mdDef}];
+        }
+        // console.log(mosaicRule);
         return mosaicRule;
+    }
+
+    function getMultidimensionalDefinition(imageServiceTitle){
+        let mdDefLookUp = {
+            "Precipitation": "Total Precipitation (mm)",
+            "Runoff": "Total Runoff (mm)",
+            "Soil Moisture": "Total Soil Moisture 0 to 200cm (mm)"
+        };
+        return mdDefLookUp[imageServiceTitle] || null;
     }
 
     function addPointToMAp(geometry) {
