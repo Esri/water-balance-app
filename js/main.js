@@ -1659,8 +1659,6 @@ require(["esri/graphic", "esri/geometry/Point", "esri/symbols/SimpleMarkerSymbol
         var headers = ['Time'];
         var timeFormatFullMonthName = d3.time.format("%m/%d/%Y");
 
-        console.log(app.mainChart.rawData);
-
         // get column headers
         app.mainChart.rawData.forEach(function (item, idx) {
             if(item.key !== 'ChangeInStorage'){
@@ -1792,7 +1790,7 @@ require(["esri/graphic", "esri/geometry/Point", "esri/symbols/SimpleMarkerSymbol
                 color = "#b15a4d";
                 break;
             case "ChangeInStorage":
-                color = "#129876";
+                color = "#404040";
                 break;
             case "Snowpack":
                 color = "#f9f9f9";
