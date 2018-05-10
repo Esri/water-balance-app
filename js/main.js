@@ -20,12 +20,12 @@
    limitations under the License.​
 */
 
-require(["esri/graphic", "esri/geometry/Point", "esri/symbols/SimpleMarkerSymbol", "esri/symbols/SimpleLineSymbol", "esri/Color", "esri/arcgis/utils", "esri/TimeExtent", "esri/layers/MosaicRule", "esri/tasks/ImageServiceIdentifyTask", "esri/tasks/ImageServiceIdentifyParameters", "esri/dijit/Search", "esri/request", "esri/geometry/webMercatorUtils", "dojo/on", "dojo/dom-class", "dojo/_base/connect", "dojo/Deferred"], function (Graphic, Point, SimpleMarkerSymbol, SimpleLineSymbol, Color, arcgisUtils, TimeExtent, MosaicRule, ImageServiceIdentifyTask, ImageServiceIdentifyParameters, Search, esriRequest, webMercatorUtils, on, domClass, connect, Deferred) {
+require(["esri/graphic", "esri/geometry/Point", "esri/symbols/SimpleMarkerSymbol", "esri/symbols/SimpleLineSymbol", "esri/Color", "esri/arcgis/utils", "esri/TimeExtent", "esri/layers/MosaicRule", "esri/tasks/ImageServiceIdentifyTask", "esri/tasks/ImageServiceIdentifyParameters", "esri/dijit/Search", "esri/request", "esri/geometry/webMercatorUtils", "esri/layers/RasterFunction", "dojo/on", "dojo/dom-class", "dojo/_base/connect", "dojo/Deferred"], function (Graphic, Point, SimpleMarkerSymbol, SimpleLineSymbol, Color, arcgisUtils, TimeExtent, MosaicRule, ImageServiceIdentifyTask, ImageServiceIdentifyParameters, Search, esriRequest, webMercatorUtils, RasterFunction, on, domClass, connect, Deferred) {
     // Enforce strict mode
     'use strict';
 
     var app = { "webMapID": "c132c7e396f64a11bfa1c24082bdb0c5" };
-
+    
     //initiate the app
     arcgisUtils.createMap(app.webMapID, "mapDiv").then(function (response) {
         app.map = response.map;
@@ -123,7 +123,7 @@ require(["esri/graphic", "esri/geometry/Point", "esri/symbols/SimpleMarkerSymbol
     }
 
     function getValidateChartData(chartData) {
-        console.log('chartData', chartData);
+        // console.log('chartData', chartData);
         var minLength = Number.POSITIVE_INFINITY;
         chartData.forEach(function (d, i) {
             if (d.values.length < minLength) {
@@ -144,12 +144,17 @@ require(["esri/graphic", "esri/geometry/Point", "esri/symbols/SimpleMarkerSymbol
         var deferred = new Deferred();
         var imageServiceIdentifyTask = new ImageServiceIdentifyTask(identifyTaskURL);
         var imageServiceIdentifyTaskParams = new ImageServiceIdentifyParameters();
+        var rasterFunction = new RasterFunction();  
+        rasterFunction.functionName = "None";  
+
         imageServiceIdentifyTaskParams.returnCatalogItems = true;
         imageServiceIdentifyTaskParams.returnGeometry = false;
         imageServiceIdentifyTaskParams.geometry = inputGeometry;
         imageServiceIdentifyTaskParams.mosaicRule = getMosaicRule(imageServiceTitle);
+        imageServiceIdentifyTaskParams.renderingRule = rasterFunction;
 
         imageServiceIdentifyTask.execute(imageServiceIdentifyTaskParams).then(function (response) {
+            // process the identify results if the vale is not NoData except for Snowpack layer, because there could be values for others layers but not for snowpack
             if (response.value !== "NoData" || imageServiceTitle === "Snowpack") {
                 var processedResults = processIdentifyTaskResults(response, imageServiceTitle);
                 deferred.resolve(processedResults);
@@ -164,6 +169,7 @@ require(["esri/graphic", "esri/geometry/Point", "esri/symbols/SimpleMarkerSymbol
     }
 
     function processIdentifyTaskResults(results, imageServiceTitle) {
+        // console.log('calling processIdentifyTaskResults for ' + imageServiceTitle, results);
         var processedResults = {
             "key": imageServiceTitle,
             "values": []
@@ -215,13 +221,30 @@ require(["esri/graphic", "esri/geometry/Point", "esri/symbols/SimpleMarkerSymbol
                 };
             });
         }
+        // console.log('processedResults', processedResults);
         return processedResults;
     }
 
     function getMosaicRule(imageServiceTitle) {
         var mosaicRule = new MosaicRule();
+        var mdDef = getMultidimensionalDefinition(imageServiceTitle);
+
         mosaicRule.where = "tag = 'Composite'";
+        mosaicRule.ascending = false;
+        if(mdDef){
+            mosaicRule.multidimensionalDefinition = [{"variableName": mdDef}];
+        }
+        // console.log(mosaicRule);
         return mosaicRule;
+    }
+
+    function getMultidimensionalDefinition(imageServiceTitle){
+        let mdDefLookUp = {
+            "Precipitation": "Total Precipitation (mm)",
+            "Runoff": "Total Runoff (mm)",
+            "Soil Moisture": "Total Soil Moisture 0 to 200cm (mm)"
+        };
+        return mdDefLookUp[imageServiceTitle] || null;
     }
 
     function addPointToMAp(geometry) {
@@ -434,6 +457,8 @@ require(["esri/graphic", "esri/geometry/Point", "esri/symbols/SimpleMarkerSymbol
         var currentTimeValueByMousePosition;
         var highlightTimeValue = uniqueTimeValues[uniqueTimeValues.length - 1];
         var highlightRefLineColor = "#a00000";
+        var diveringBarColorPos = '#542788';
+        var diveringBarColorNeg = '#7f2704';
 
         var getDomainFromData = function getDomainFromData(values, key) {
             var domain = [];
@@ -468,6 +493,10 @@ require(["esri/graphic", "esri/geometry/Point", "esri/symbols/SimpleMarkerSymbol
         var runoffData = data.filter(function (d) {
             return d.key === "Runoff";
         });
+        var changeInStorageChartData = data.filter(function (d) {
+            return d.key === "Change in Storage";
+        });
+        // console.log(changeInStorageChartData);
 
         var xScaleDomain = getDomainFromData(precipData[0].values, "stdTime");
         // Set the dimensions of the canvas / graph
@@ -496,12 +525,38 @@ require(["esri/graphic", "esri/geometry/Point", "esri/symbols/SimpleMarkerSymbol
 
         var barWidth = getBarChartWidth();
 
-        var bars = svg.selectAll("bar").data(precipData[0].values).enter().append("rect").attr("clip-path", "url(#chartAreaClip)").style("fill", getColorByKey("Precipitation")).style("opacity", 0.7).attr("x", function (d) {
+        var bars = svg.selectAll("bar")
+        .data(precipData[0].values).enter()
+        .append("rect")
+        .attr("clip-path", "url(#chartAreaClip)")
+        .style("fill", getColorByKey("Precipitation"))
+        .style("opacity", 0.7)
+        .attr("x", function (d) {
             return xScale(d.stdTime) - barWidth / 2;
-        }).attr("width", barWidth).attr("y", function (d) {
+        }).attr("width", barWidth)
+        .attr("y", function (d) {
             return yScale(d.value);
         }).attr("height", function (d) {
             return height - margin.top - yScale(d.value);
+        });
+
+        // diverging bars for change in storage
+        var diveringBars = svg.selectAll("diverging-bar")
+        .data(changeInStorageChartData[0].values).enter()
+        .append("rect")
+        .attr("clip-path", "url(#chartAreaClip)")
+        // .style("fill", getColorByKey("ChangeInStorage"))
+        .style("fill", function(d){
+            return d.value < 0 ? diveringBarColorNeg : diveringBarColorPos;
+        })
+        .style("opacity", 0.7)
+        .attr("x", function (d) {
+            return xScale(d.stdTime) - barWidth / 2;
+        }).attr("width", barWidth)
+        .attr("y", function (d) {
+            return d.value < 0 ? yScale(0) : yScale(d.value);
+        }).attr("height", function (d) {
+            return Math.abs(yScale(d.value) - yScale(0)); 
         });
 
         var lineFeatures = svg.selectAll('line-features').data(runoffData.concat(evapoData)).enter().append('g').attr('class', 'line-features');
@@ -646,6 +701,16 @@ require(["esri/graphic", "esri/geometry/Point", "esri/symbols/SimpleMarkerSymbol
             }).attr("height", function (d) {
                 return height - margin.top - yScale(d.value);
             });
+
+            diveringBars.attr("x", function (d) {
+                return xScale(d.stdTime) - newBarWidth / 2;
+            }).attr("width", newBarWidth)
+            .attr("y", function (d) {
+                return d.value < 0 ? yScale(0) : yScale(d.value);
+            }).attr("height", function (d) {
+                return Math.abs(yScale(d.value) - yScale(0)); 
+            });
+
             setHighlightRefLineByTime(highlightTimeValue);
         }
 
@@ -676,18 +741,24 @@ require(["esri/graphic", "esri/geometry/Point", "esri/symbols/SimpleMarkerSymbol
             var closestTimeValue = getClosestValue(xValueByMousePosition, uniqueTimeValues);
             var tooltipData = getChartDataByTime(closestTimeValue);
             var tooltipContent = '<span class="main-chart-tooltip-header">' + timeFormatWithMonth(new Date(closestTimeValue)) + '</span><hr>';
-            var tooltipX = mousePositionX > prevMouseXPosition ? d3.event.pageX - 185 : d3.event.pageX + 175 < container.width() ? d3.event.pageX + 20 : d3.event.pageX - 185;
+            // var tooltipX = mousePositionX > prevMouseXPosition ? d3.event.pageX - 185 : d3.event.pageX + 175 < container.width() ? d3.event.pageX + 20 : d3.event.pageX - 185;
             var monthlySelectValue = $(".month-select").val();
+            var selectedMapLayerName = $(".map-layer-select").val();
+            var containerTopPos = container.offset().top
 
             currentTimeValueByMousePosition = closestTimeValue;
             d3.select(".verticalLine").attr("transform", function () {
                 return "translate(" + xScale(closestTimeValue) + ", 0)";
             });
             tooltipData = tooltipData.filter(function (d) {
-                if (app.isWaterStorageChartVisible) {
-                    return d.key === "Soil Moisture" || d.key === "Snowpack";
+                if(selectedMapLayerName === 'Change in Storage'){
+                    return d.key === "Change in Storage"
                 } else {
-                    return d.key === "Precipitation" || d.key === "Runoff" || d.key === "Evapotranspiration";
+                    if (app.isWaterStorageChartVisible) {
+                        return d.key === "Soil Moisture" || d.key === "Snowpack";
+                    } else {
+                        return d.key === "Precipitation" || d.key === "Runoff" || d.key === "Evapotranspiration";
+                    }
                 }
             });
             tooltipData.sort(function (a, b) {
@@ -695,12 +766,14 @@ require(["esri/graphic", "esri/geometry/Point", "esri/symbols/SimpleMarkerSymbol
             });
             tooltipData.forEach(function (d) {
                 var textColor = getColorByKey(d.key);
-                var isElementVisible = $(".legend-wrapper[value='" + d.key + "']").is(':visible');
+                var isElementVisible = (selectedMapLayerName === 'Change in Storage') ? true : $(".legend-wrapper[value='" + d.key + "']").is(':visible');
                 if (isElementVisible) {
                     tooltipContent += '<span class="with-unit tooltip-text-bold" style="color:' + textColor + '">' + d.key + ': ' + parseInt(d.value) + '</span><br>';
                 }
             });
-            tooltipDiv.html(tooltipContent).style("left", Math.max(0, tooltipX) + "px").style("top", d3.event.pageY - 50 + "px");
+
+            var tooltipX = d3.event.pageX - $('.tooltip').width()/2;
+            tooltipDiv.html(tooltipContent).style("left", Math.max(0, tooltipX) + "px").style("top", (containerTopPos - $('.tooltip').height() + margin.top - 5) + "px");
 
             if (monthlySelectValue !== "MonthlyNormals" && monthlySelectValue !== "Annual") {
                 app.monthlyTrendChart.highlightTrendLineByMonth(timeFormatFullMonthName(new Date(closestTimeValue)));
@@ -897,73 +970,105 @@ require(["esri/graphic", "esri/geometry/Point", "esri/symbols/SimpleMarkerSymbol
             xScale.domain(getXScaleDomainByContainerSize());
             var selectedMapLayerName = $(".map-layer-select").val();
             var barWidth = getBarChartWidth();
-            if (app.isWaterStorageChartVisible) {
-                yScale.domain([0, d3.max(areaChartData, function (d) {
-                    return d.y0 + d.y;
-                })]);
-                areas.style("opacity", ".8");
+
+            if(selectedMapLayerName === 'Change in Storage'){
+                areas.style("opacity", "0");
                 lines.style("opacity", "0");
                 haloLines.style("opacity", "0");
                 bars.style("opacity", "0");
-                verticalLine.style("stroke", "#efefef");
-                $(".main-chart-title").text("Water Storage ");
-            } else {
-                yScale.domain(getDomainFromData(precipData[0].values.concat(runoffData[0].values, evapoData[0].values), "value"));
-                areas.style("opacity", "0");
-                lines.style("opacity", ".8");
-                haloLines.style("opacity", ".8");
-                bars.style("opacity", ".8");
-                verticalLine.style("stroke", "#909090");
-                $(".main-chart-title").text("Water Flux ");
-            }
-            yAxisG.transition().duration(1000).ease("sin-in-out").call(yAxis);
-            xAxisG.transition().duration(1000).ease("sin-in-out").call(xAxis);
-            lines.transition().duration(1000).attr('d', function (d) {
-                return createLine(d.values);
-            });
-            haloLines.transition().duration(1000).attr('d', function (d) {
-                return createLine(d.values);
-            });
-            areas.transition().duration(1000).attr("d", function (d) {
-                return createArea(d.values);
-            });
-            bars.transition().duration(1000).attr("y", function (d) {
-                return yScale(d.value);
-            }).attr("x", function (d) {
-                return xScale(d.stdTime) - barWidth / 2;
-            }).attr("width", barWidth).attr("height", function (d) {
-                return height - margin.top - yScale(d.value);
-            });
+                diveringBars.style("opacity", ".8");
 
-            if (!app.isWaterStorageChartVisible) {
-                var visibleLineFeatureKey;
-                if (selectedMapLayerName !== "Precipitation") {
-                    visibleLineFeatureKey = selectedMapLayerName;
-                    $(".legend-wrapper[value='Runoff']").hide();
-                    $(".legend-wrapper[value='Evapotranspiration']").hide();
-                    $(".legend-wrapper[value='" + selectedMapLayerName + "']").show();
+                var yRange = d3.extent(changeInStorageChartData[0].values, function(d) { return d.value; });
+
+                yScale.domain(yRange).nice();
+                yScale.range([height - margin.top, 0]);
+
+                yAxisG.transition().duration(1000).ease("sin-in-out").call(yAxis);
+                xAxisG.transition().duration(1000).ease("sin-in-out").call(xAxis);
+
+                diveringBars.attr("x", function (d) {
+                    return xScale(d.stdTime) - barWidth / 2;
+                }).attr("width", barWidth)
+                .attr("y", function (d) {
+                    return d.value < 0 ? yScale(0) : yScale(d.value);
+                }).attr("height", function (d) {
+                    return Math.abs(yScale(d.value) - yScale(0)); 
+                });
+
+                $(".main-chart-title").text("Change in Storage");
+
+            } else {
+                diveringBars.style("opacity", "0");
+                
+                if (app.isWaterStorageChartVisible) {
+                    yScale.domain([0, d3.max(areaChartData, function (d) {
+                        return d.y0 + d.y;
+                    })]);
+                    areas.style("opacity", ".8");
+                    lines.style("opacity", "0");
+                    haloLines.style("opacity", "0");
+                    bars.style("opacity", "0");
+                    verticalLine.style("stroke", "#efefef");
+                    $(".main-chart-title").text("Water Storage ");
                 } else {
-                    visibleLineFeatureKey = "Runoff";
-                    $(".legend-wrapper[value='Runoff']").show();
-                    $(".legend-wrapper[value='Evapotranspiration']").hide();
+                    yScale.domain(getDomainFromData(precipData[0].values.concat(runoffData[0].values, evapoData[0].values), "value"));
+                    areas.style("opacity", "0");
+                    lines.style("opacity", ".8");
+                    haloLines.style("opacity", ".8");
+                    bars.style("opacity", ".8");
+                    verticalLine.style("stroke", "#909090");
+                    $(".main-chart-title").text("Water Flux ");
                 }
-                lines.each(function (d) {
-                    var lineElement = d3.select(this).node();
-                    if (d.key === visibleLineFeatureKey) {
-                        d3.select(lineElement).style("opacity", 0.8);
-                    } else {
-                        d3.select(lineElement).style("opacity", 0);
-                    }
+                yAxisG.transition().duration(1000).ease("sin-in-out").call(yAxis);
+                xAxisG.transition().duration(1000).ease("sin-in-out").call(xAxis);
+                lines.transition().duration(1000).attr('d', function (d) {
+                    return createLine(d.values);
                 });
-                haloLines.each(function (d) {
-                    var lineElement = d3.select(this).node();
-                    if (d.key === visibleLineFeatureKey) {
-                        d3.select(lineElement).style("opacity", 0.8);
-                    } else {
-                        d3.select(lineElement).style("opacity", 0);
-                    }
+                haloLines.transition().duration(1000).attr('d', function (d) {
+                    return createLine(d.values);
                 });
+                areas.transition().duration(1000).attr("d", function (d) {
+                    return createArea(d.values);
+                });
+                bars.transition().duration(1000).attr("y", function (d) {
+                    return yScale(d.value);
+                }).attr("x", function (d) {
+                    return xScale(d.stdTime) - barWidth / 2;
+                }).attr("width", barWidth).attr("height", function (d) {
+                    return height - margin.top - yScale(d.value);
+                });
+    
+                if (!app.isWaterStorageChartVisible) {
+                    var visibleLineFeatureKey;
+                    if (selectedMapLayerName !== "Precipitation") {
+                        visibleLineFeatureKey = selectedMapLayerName;
+                        $(".legend-wrapper[value='Runoff']").hide();
+                        $(".legend-wrapper[value='Evapotranspiration']").hide();
+                        $(".legend-wrapper[value='" + selectedMapLayerName + "']").show();
+                    } else {
+                        visibleLineFeatureKey = "Runoff";
+                        $(".legend-wrapper[value='Runoff']").show();
+                        $(".legend-wrapper[value='Evapotranspiration']").hide();
+                    }
+                    lines.each(function (d) {
+                        var lineElement = d3.select(this).node();
+                        if (d.key === visibleLineFeatureKey) {
+                            d3.select(lineElement).style("opacity", 0.8);
+                        } else {
+                            d3.select(lineElement).style("opacity", 0);
+                        }
+                    });
+                    haloLines.each(function (d) {
+                        var lineElement = d3.select(this).node();
+                        if (d.key === visibleLineFeatureKey) {
+                            d3.select(lineElement).style("opacity", 0.8);
+                        } else {
+                            d3.select(lineElement).style("opacity", 0);
+                        }
+                    });
+                }
             }
+
             setHighlightRefLineByTime(highlightTimeValue);
         };
 
@@ -1067,6 +1172,14 @@ require(["esri/graphic", "esri/geometry/Point", "esri/symbols/SimpleMarkerSymbol
                 return yScale(d.value);
             }).attr("height", function (d) {
                 return height - margin.top - yScale(d.value);
+            });
+            diveringBars.attr("x", function (d) {
+                return xScale(d.stdTime) - newBarWidth / 2;
+            }).attr("width", newBarWidth)
+            .attr("y", function (d) {
+                return d.value < 0 ? yScale(0) : yScale(d.value);
+            }).attr("height", function (d) {
+                return Math.abs(yScale(d.value) - yScale(0)); 
             });
             overlay.attr("width", width - margin.right - xAxisWidthOffset).attr("height", height - margin.top);
 
@@ -1458,10 +1571,12 @@ require(["esri/graphic", "esri/geometry/Point", "esri/symbols/SimpleMarkerSymbol
                 return createLineForMonthlyNormals(getMonthlyNormalsData(d));
             });
             tooltipTextForYValue.style("fill", function () {
-                return getColorByKey(dataLayerType);
+                // return getColorByKey(dataLayerType);
+                return '#fff';
             });
             tooltipTextForXValue.style("fill", function () {
-                return getColorByKey(dataLayerType);
+                // return getColorByKey(dataLayerType);
+                return '#303030';
             });
         };
 
@@ -1498,6 +1613,7 @@ require(["esri/graphic", "esri/geometry/Point", "esri/symbols/SimpleMarkerSymbol
             xAxisG.style("opacity", 0);
             xAxisGForMonthlyNormals.style("opacity", 0);
 
+            dataLayerType = dataLayerType === 'Change in Storage' ? 'ChangeInStorage' : dataLayerType;
             if (monthlySelectValue !== "MonthlyNormals") {
                 lines.each(function (d) {
                     var lineElement = d3.select(this).node();
@@ -1546,9 +1662,11 @@ require(["esri/graphic", "esri/geometry/Point", "esri/symbols/SimpleMarkerSymbol
 
         // get column headers
         app.mainChart.rawData.forEach(function (item, idx) {
-            var header = item.key === 'ChangeInStorage' ? 'Change In Storage' : item.key;
-            header += ' (mm)';
-            headers.push(header);
+            if(item.key !== 'ChangeInStorage'){
+                var header = item.key + ' (mm)'; //=== 'ChangeInStorage' ? 'Change In Storage' : item.key;
+                // header += ' (mm)';
+                headers.push(header);
+            }
         });
         // set csv headers
         str += headers.join(',');
@@ -1571,15 +1689,21 @@ require(["esri/graphic", "esri/geometry/Point", "esri/symbols/SimpleMarkerSymbol
     $(".map-layer-select").change(function () {
         var selectedMapLayer = $(this).val();
         var selectedMapLayerCategory = $(".map-layer-select option:selected").attr("category");
-        if (selectedMapLayerCategory === "waterflux") {
-            app.isWaterStorageChartVisible = false;
-            $(".waterfulx-legend").removeClass("hide");
+        if(!selectedMapLayerCategory){
+            $(".waterfulx-legend").addClass("hide");
             $(".waterstorage-legend").addClass("hide");
         } else {
-            app.isWaterStorageChartVisible = true;
-            $(".waterfulx-legend").addClass("hide");
-            $(".waterstorage-legend").removeClass("hide");
+            if (selectedMapLayerCategory === "waterflux") {
+                app.isWaterStorageChartVisible = false;
+                $(".waterfulx-legend").removeClass("hide");
+                $(".waterstorage-legend").addClass("hide");
+            } else {
+                app.isWaterStorageChartVisible = true;
+                $(".waterfulx-legend").addClass("hide");
+                $(".waterstorage-legend").removeClass("hide");
+            }
         }
+
         setDataLayerSelectValue(selectedMapLayer);
         if (app.mainChart) {
             app.mainChart.toggleChartViews();
@@ -1667,7 +1791,7 @@ require(["esri/graphic", "esri/geometry/Point", "esri/symbols/SimpleMarkerSymbol
                 color = "#b15a4d";
                 break;
             case "ChangeInStorage":
-                color = "#129876";
+                color = "#404040";
                 break;
             case "Snowpack":
                 color = "#f9f9f9";
@@ -1676,6 +1800,7 @@ require(["esri/graphic", "esri/geometry/Point", "esri/symbols/SimpleMarkerSymbol
                 color = "#598fb8";
                 break;
         }
+        color = color ? color : '#fff';
         return color;
     }
 
