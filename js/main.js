@@ -24,8 +24,7 @@ require(["esri/graphic", "esri/geometry/Point", "esri/symbols/SimpleMarkerSymbol
     // Enforce strict mode
     'use strict';
 
-    // var app = { "webMapID": "c132c7e396f64a11bfa1c24082bdb0c5" };
-    var app = { "webMapID": "70b28c8c75e5481c8334b57e6c72e671" };
+    var app = { "webMapID": "c132c7e396f64a11bfa1c24082bdb0c5" };
     
     //initiate the app
     arcgisUtils.createMap(app.webMapID, "mapDiv").then(function (response) {
@@ -124,7 +123,7 @@ require(["esri/graphic", "esri/geometry/Point", "esri/symbols/SimpleMarkerSymbol
     }
 
     function getValidateChartData(chartData) {
-        console.log('chartData', chartData);
+        // console.log('chartData', chartData);
         var minLength = Number.POSITIVE_INFINITY;
         chartData.forEach(function (d, i) {
             if (d.values.length < minLength) {
@@ -458,6 +457,8 @@ require(["esri/graphic", "esri/geometry/Point", "esri/symbols/SimpleMarkerSymbol
         var currentTimeValueByMousePosition;
         var highlightTimeValue = uniqueTimeValues[uniqueTimeValues.length - 1];
         var highlightRefLineColor = "#a00000";
+        var diveringBarColorPos = '#542788';
+        var diveringBarColorNeg = '#7f2704';
 
         var getDomainFromData = function getDomainFromData(values, key) {
             var domain = [];
@@ -546,7 +547,7 @@ require(["esri/graphic", "esri/geometry/Point", "esri/symbols/SimpleMarkerSymbol
         .attr("clip-path", "url(#chartAreaClip)")
         // .style("fill", getColorByKey("ChangeInStorage"))
         .style("fill", function(d){
-            return d.value < 0 ? '#983232' : '222298';
+            return d.value < 0 ? diveringBarColorNeg : diveringBarColorPos;
         })
         .style("opacity", 0.7)
         .attr("x", function (d) {
