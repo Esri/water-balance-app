@@ -29,10 +29,12 @@ const LoaderDiv = styled.div`
 
 interface Props {
     isLoading?: boolean;
+    isMobile?: boolean;
 }
 
 const BottomPanel:React.FC<Props> = ({
     isLoading,
+    isMobile,
     children
 })=>{
 
@@ -46,12 +48,15 @@ const BottomPanel:React.FC<Props> = ({
         );
     }
 
+    const getContent = ()=>{
+        return isLoading 
+            ? getLoader()
+            : children;
+    }
+
     return (
         <BottomPanelDiv>
-            { isLoading 
-                ? getLoader()
-                : children
-            }
+            { getContent() }
         </BottomPanelDiv>
     );
 };

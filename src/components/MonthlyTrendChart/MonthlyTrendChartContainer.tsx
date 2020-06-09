@@ -21,6 +21,8 @@ import MouseEventsRect, { MouseEventItem } from './MouseEventsRect';
 import Tooltip from './Tooltip';
 import Header from './Header';
 
+import useWindowSize from '../../hooks/useWindowSize';
+
 const ContainerDiv = styled.div`
     position: relative;
     flex-grow: 0;
@@ -42,6 +44,8 @@ const MonthlyTrendChart:React.FC<Props> = ({
 })=>{
 
     const [ itemOnHover, setItemOnHOver ] = React.useState<MouseEventItem>();
+
+    const [ windowWidth ] = useWindowSize();
 
     const getXDomain = ()=>{
         if(!data){
@@ -82,7 +86,7 @@ const MonthlyTrendChart:React.FC<Props> = ({
         return data[activeLayer];
     };
 
-    return (
+    return windowWidth >= 1200 ? (
         <ContainerDiv>
             <Header 
                 activeLayer={activeLayer}
@@ -114,7 +118,7 @@ const MonthlyTrendChart:React.FC<Props> = ({
 
             </SvgContainer>
         </ContainerDiv>
-    );
+    ) : null;
 };
 
 export default MonthlyTrendChart;

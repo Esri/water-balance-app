@@ -18,7 +18,8 @@ import {
     MonthlyTrendChart,
     QueryLocationGraphic,
     InfoModal,
-    Legend
+    Legend,
+    MobileDeviceAlert
 } from '../../components';
 
 import {
@@ -43,7 +44,7 @@ const App:React.FC<Props> = ({
 
 }: Props)=>{
 
-    const { timeExtentForGldasLayers } = React.useContext(AppContext);
+    const { timeExtentForGldasLayers, isMobile } = React.useContext(AppContext);
 
     const [ activeLayer, setActiveLayer ] = React.useState<GldasLayerName>('Soil Moisture');
 
@@ -60,7 +61,7 @@ const App:React.FC<Props> = ({
     const [ isInfoModalOpen, setIsInfoModalOpen ] = React.useState<boolean>(false);
 
     const [ isLoading, setIsLoading ] = React.useState<boolean>(false);
-
+    
     const fetchGldasData = async(point:IPoint)=>{
 
         setIsLoading(true);
@@ -80,13 +81,14 @@ const App:React.FC<Props> = ({
 
     const getBottomPanel = ()=>{
 
-        if (!gldasData || !gldasDataByMonth) {
+        if (!gldasData || !gldasDataByMonth || isMobile) {
             return null;
         }
-            
+     
         return ( 
             <BottomPanel
                 isLoading={isLoading}
+                isMobile={isMobile}
             >
                 <ChangeInStorageIndicator 
                     data={gldasData}
@@ -137,7 +139,7 @@ const App:React.FC<Props> = ({
 
     React.useEffect(()=>{
         if(queryLocation){
-            fetchGldasData(queryLocation)
+            fetchGldasData(queryLocation);
         }
     }, [ queryLocation ]);
 
@@ -148,7 +150,7 @@ const App:React.FC<Props> = ({
             />
 
             <MapView
-                paddingBottom={ gldasData ? UIConfig["bottom-panel-height"] : 0 }
+                paddingBottom={ gldasData && !isMobile ? UIConfig["bottom-panel-height"] : 0 }
                 onClickHandler={setQueryLocation}
             >
                 <GldasLayer 
@@ -178,6 +180,10 @@ const App:React.FC<Props> = ({
             <InfoModal 
                 isOpen={isInfoModalOpen}
                 onClose={setIsInfoModalOpen.bind(this, false)}
+            />
+
+            <MobileDeviceAlert 
+                isVisible={ isMobile }
             />
         </>
     ) : null;

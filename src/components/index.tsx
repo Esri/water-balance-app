@@ -25,3 +25,5 @@ export { default as QueryLocationGraphic } from './QueryLocationGraphic/QueryLoc
 export { default as InfoModal } from './InfoModal/InfoModal';
 
 export { default as Legend } from './Legend/Legend';
+
+export { default as MobileDeviceAlert } from './MobileDeviceAlert/MobileDeviceAlert';
