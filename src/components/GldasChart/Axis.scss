@@ -1,0 +1,11 @@
+.axis path, 
+.axis line {
+    fill: none;
+    stroke: #d1eeff;
+    shape-rendering: crispEdges; 
+    opacity: .7;
+}
+
+.axis text {
+    fill: #0079c1;
+}

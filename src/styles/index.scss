@@ -1,0 +1,13 @@
+@import '~calcite-web/dist/css/calcite-web.min.css';
+
+.cursor-pointer{
+    cursor: pointer;
+}
+
+#root {
+    .esri-legend {
+        .esri-legend__layer-caption {
+            display: none;
+        }
+    }
+}
