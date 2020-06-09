@@ -13,15 +13,32 @@ The [Water Balance App](https://livingatlasdev.arcgis.com/waterbalance/) is a we
 
 ## Instructions
 
-1. Fork and then clone the repo. 
-2. Navigate to the home directory of the repo on your local machine with the web server running and view the app
+To begin, clone this repository to your computer, from the project's root directory, install the required packages (dependencies):
+
+```sh
+npm install
+```
+
+## Running the app 
+Now you can start the webpack dev server to test the app on your local machine:
+
+```sh
+# it will start a server instance and begin listening for connections from localhost on port 8080
+npm run start
+```
+
+## Deployment
+To build/deploye the app, you can simply run:
+
+```sh
+# it will place all files needed for deployment into the /build directory 
+npm run build
+```
 
 ## Requirements
 
-- [ArcGIS API for JavaScript (version 3.20)](https://developers.arcgis.com/javascript/index.html)
-- [D3.js (version 3)](https://d3js.org/)
-- [jQuery](http://jquery.com/)
-- [Moment.js](http://momentjs.com/)
+- [ArcGIS API for JavaScript (version 4.15)](https://developers.arcgis.com/javascript/index.html)
+- [D3.js (version 5)](https://d3js.org/)
 
 ## Resources
 
@@ -39,7 +56,7 @@ Find a bug or want to request a new feature?  Please let us know by submitting a
 Esri welcomes contributions from anyone and everyone. Please see our [guidelines for contributing](https://github.com/esri/contributing).
 
 ## Licensing
-Copyright 2016 Esri
+Copyright 2020 Esri
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
