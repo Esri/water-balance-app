@@ -61,7 +61,7 @@ const App:React.FC<Props> = ({
     const [ isInfoModalOpen, setIsInfoModalOpen ] = React.useState<boolean>(false);
 
     const [ isLoading, setIsLoading ] = React.useState<boolean>(false);
-
+    
     const fetchGldasData = async(point:IPoint)=>{
 
         setIsLoading(true);
