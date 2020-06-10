@@ -2,7 +2,7 @@
 
 The [Water Balance App](https://livingatlasdev.arcgis.com/waterbalance/) is a web based mapping application that is used to explore and visualize the worldwide climate data that have been collected since January 2000 to present, this climate record is maintained by NASA through it's Global Land Data Assimilation System ([GLDAS](https://ldas.gsfc.nasa.gov/)), and is updated each month as new data becomes available.. Learn more [here](https://blogs.esri.com/esri/arcgis/2017/09/25/explore-climate-trends-with-the-water-balance-app/).
 
-[View it live](https://livingatlasdev.arcgis.com/waterbalance/)
+[View it live](https://livingatlas.arcgis.com/waterbalance/)
 
 ![App](water-balance-app.gif)
 
