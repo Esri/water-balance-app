@@ -19,7 +19,8 @@ import {
     QueryLocationGraphic,
     InfoModal,
     Legend,
-    MobileDeviceAlert
+    MobileDeviceAlert,
+    ErrorAlert
 } from '../../components';
 
 import {
@@ -61,27 +62,36 @@ const App:React.FC<Props> = ({
     const [ isInfoModalOpen, setIsInfoModalOpen ] = React.useState<boolean>(false);
 
     const [ isLoading, setIsLoading ] = React.useState<boolean>(false);
+
+    const [ isDataDFetchingFailed, setIsDataFetchingFaied ] = React.useState<boolean>(false);
     
     const fetchGldasData = async(point:IPoint)=>{
 
         setIsLoading(true);
+        setIsDataFetchingFaied(false);
 
-        const {
-            identifyResults,
-            identifyResultsByMonth
-        } = await getGLDASdata(point);
+        try {
+            const {
+                identifyResults,
+                identifyResultsByMonth
+            } = await getGLDASdata(point);
+    
+            // console.log(identifyResults, identifyResultsByMonth)
+            setGldasData(identifyResults);
+            setGldasDataByMonth(identifyResultsByMonth);
 
-        console.log(identifyResults, identifyResultsByMonth)
+        } catch(err){
+            // console.log(err);
+            setIsDataFetchingFaied(true);
+        }
 
-        setGldasData(identifyResults);
-        setGldasDataByMonth(identifyResultsByMonth);
         setIsLoading(false);
         
     };
 
     const getBottomPanel = ()=>{
 
-        if (!gldasData || !gldasDataByMonth || isMobile) {
+        if (!gldasData || !gldasDataByMonth || isMobile ) {
             return null;
         }
      
@@ -143,6 +153,13 @@ const App:React.FC<Props> = ({
         }
     }, [ queryLocation ]);
 
+    React.useEffect(()=>{
+        if(isDataDFetchingFailed){
+            setGldasData(null);
+            setGldasDataByMonth(null);
+        }
+    }, [ isDataDFetchingFailed ]);
+
     return selectedTimeExtentItem ? (
         <>
             <TopNav 
@@ -184,6 +201,11 @@ const App:React.FC<Props> = ({
 
             <MobileDeviceAlert 
                 isVisible={ isMobile }
+            />
+
+            <ErrorAlert
+                isVisible={isDataDFetchingFailed}
+                onClose={setIsDataFetchingFaied.bind(this, false)}
             />
         </>
     ) : null;

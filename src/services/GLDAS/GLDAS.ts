@@ -88,6 +88,12 @@ export const getGLDASdata = async(queryLocation: IPoint):Promise<{
 
         Promise.all(identifyTasks)
         .then((responses)=>{
+
+            if(responses[0].data && responses[0].data.value === 'NoData'){
+                reject({
+                    error: 'failed to fetch GLDAS data'
+                });
+            }
             
             const identifyResults:GldasIdentifyTaskResults = {}
 
