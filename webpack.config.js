@@ -17,7 +17,7 @@ module.exports =  (env, options)=> {
             filename: '[name].[contenthash].js',
             chunkFilename: '[name].[contenthash].js',
         },
-        devtool: 'source-map',
+        devtool: devMode ? 'source-map' : 'none',
         resolve: {
             extensions: ['.js', '.jsx', '.json', '.ts', '.tsx']
         },
@@ -95,7 +95,7 @@ module.exports =  (env, options)=> {
                 }
             }),
             new CleanWebpackPlugin(),
-            new BundleAnalyzerPlugin()
+            // new BundleAnalyzerPlugin()
         ],
         optimization: {
             splitChunks: {

@@ -23,15 +23,12 @@ import {
     ErrorAlert
 } from '../../components';
 
-import {
-    getGLDASdata,
-    GldasIdentifyTaskResults,
-    GldasIdentifyTaskResultsByMonth
-} from '../../services/GLDAS/gldas';
+import useGldasData from '../../hooks/useGldasData';
 
 import {
     GldasLayerName
 } from '../../types';
+
 import { UIConfig } from '../../AppConfig';
 
 export interface TimeExtentItem {
@@ -53,47 +50,28 @@ const App:React.FC<Props> = ({
 
     const [ previewTimeExtentItem, setPreviewTimeExtentItem ] = React.useState<TimeExtentItem>();
 
-    const [ gldasData, setGldasData ] = React.useState<GldasIdentifyTaskResults>();
-
-    const [ gldasDataByMonth, setGldasDataByMonth ] = React.useState<GldasIdentifyTaskResultsByMonth>()
-
     const [ queryLocation, setQueryLocation ] = React.useState<IPoint>();
+
+    const { 
+        gldasDataResponse, 
+        isLoading,
+        isFailed,
+        resetIsFailed
+    } = useGldasData(queryLocation);
 
     const [ isInfoModalOpen, setIsInfoModalOpen ] = React.useState<boolean>(false);
 
-    const [ isLoading, setIsLoading ] = React.useState<boolean>(false);
-
-    const [ isDataDFetchingFailed, setIsDataFetchingFaied ] = React.useState<boolean>(false);
-    
-    const fetchGldasData = async(point:IPoint)=>{
-
-        setIsLoading(true);
-        setIsDataFetchingFaied(false);
-
-        try {
-            const {
-                identifyResults,
-                identifyResultsByMonth
-            } = await getGLDASdata(point);
-    
-            // console.log(identifyResults, identifyResultsByMonth)
-            setGldasData(identifyResults);
-            setGldasDataByMonth(identifyResultsByMonth);
-
-        } catch(err){
-            // console.log(err);
-            setIsDataFetchingFaied(true);
-        }
-
-        setIsLoading(false);
-        
-    };
+    const shouldShowBottomPanel = ()=>{
+        return (gldasDataResponse && !isFailed && !isMobile );
+    }
 
     const getBottomPanel = ()=>{
 
-        if (!gldasData || !gldasDataByMonth || isMobile ) {
-            return null;
+        if(!shouldShowBottomPanel()){
+            return null
         }
+
+        const { gldasData, gldasDataByMonth } = gldasDataResponse;
      
         return ( 
             <BottomPanel
@@ -147,19 +125,6 @@ const App:React.FC<Props> = ({
         }
     }, [ timeExtentForGldasLayers ]);
 
-    React.useEffect(()=>{
-        if(queryLocation){
-            fetchGldasData(queryLocation);
-        }
-    }, [ queryLocation ]);
-
-    React.useEffect(()=>{
-        if(isDataDFetchingFailed){
-            setGldasData(null);
-            setGldasDataByMonth(null);
-        }
-    }, [ isDataDFetchingFailed ]);
-
     return selectedTimeExtentItem ? (
         <>
             <TopNav 
@@ -167,7 +132,7 @@ const App:React.FC<Props> = ({
             />
 
             <MapView
-                paddingBottom={ gldasData && !isMobile ? UIConfig["bottom-panel-height"] : 0 }
+                paddingBottom={ shouldShowBottomPanel() ? UIConfig["bottom-panel-height"] : 0 }
                 onClickHandler={setQueryLocation}
             >
                 <GldasLayer 
@@ -204,8 +169,8 @@ const App:React.FC<Props> = ({
             />
 
             <ErrorAlert
-                isVisible={isDataDFetchingFailed}
-                onClose={setIsDataFetchingFaied.bind(this, false)}
+                isVisible={isFailed}
+                onClose={resetIsFailed}
             />
         </>
     ) : null;
