@@ -1,5 +1,5 @@
 import * as React from 'react';
-import * as d3 from 'd3';
+import { select, axisBottom, axisLeft } from 'd3';
 
 import {
     Scales,
@@ -20,12 +20,11 @@ const Axis:React.FC<Props> = ({
 
         const { height, g } = svgContainerData;
 
-        const mainGroup = d3.select(g);
+        const mainGroup = select(g);
 
         const { x } = scales;
 
-        const xAxis = d3
-            .axisBottom(x)
+        const xAxis = axisBottom(x)
             .tickSizeInner(-(height))
             .tickValues(x.domain().filter(d=>!(d % 2)))
             .tickFormat(d=>{
@@ -55,10 +54,9 @@ const Axis:React.FC<Props> = ({
 
         const { y } = scales;
 
-        const mainGroup = d3.select(g);
+        const mainGroup = select(g);
 
-        const yAxis = d3
-            .axisLeft(y)
+        const yAxis = axisLeft(y)
             .ticks(9)
             .tickSizeInner(-(width))
             .tickPadding(5)

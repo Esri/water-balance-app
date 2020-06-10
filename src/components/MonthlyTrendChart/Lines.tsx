@@ -1,5 +1,5 @@
 import * as React from 'react';
-import * as d3 from 'd3';
+import { select, curveCardinal, line  } from 'd3';
 
 import {
     GldasLayerName
@@ -51,19 +51,19 @@ const Line:React.FC<Props> = ({
     const initContainer = ()=>{
         const { g } = svgContainerData;
 
-        containerG.current = d3.select(g)
+        containerG.current = select(g)
             .append('g')
             .node();
     };
 
     const draw = ()=>{
 
-        const containerGroup = d3.select(containerG.current);
+        const containerGroup = select(containerG.current);
 
         const { x, y } = scales;
 
-        const valueline = d3.line<GldasIdentifyTaskResultItem>()
-            .curve(d3.curveCardinal)
+        const valueline = line<GldasIdentifyTaskResultItem>()
+            .curve(curveCardinal)
             .x(d=>x(d.date.getFullYear()) + x.bandwidth() / 2)
             .y(d=>y(d.value));
 
@@ -92,7 +92,7 @@ const Line:React.FC<Props> = ({
 
     const remove = ()=>{
 
-        const lineGroup = d3.select(containerG.current).selectAll(`.${LineGroupClassName}`);
+        const lineGroup = select(containerG.current).selectAll(`.${LineGroupClassName}`);
         
         if(lineGroup.size()){
             lineGroup.remove().exit();

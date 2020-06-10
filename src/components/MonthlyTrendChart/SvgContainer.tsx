@@ -1,6 +1,6 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import * as d3 from 'd3';
+import { select, scaleBand, scaleLinear } from 'd3';
 import { HeaderHeight } from './Header';
 
 interface ContainerDivProps {
@@ -71,7 +71,7 @@ const SvgContainer:React.FC<Props> = ({
             width
         };
 
-        d3.select(container)
+        select(container)
             .append("svg")
                 .attr("width", width + margin.left + margin.right)
                 .attr("height", height + margin.top + margin.bottom)
@@ -81,7 +81,7 @@ const SvgContainer:React.FC<Props> = ({
                     `translate(${margin.left}, ${margin.top})`
                 );
         
-        const svgSelector = d3.select(container)
+        const svgSelector = select(container)
             .select<SVGElement>('svg');
 
         const svg = svgSelector.node();
@@ -92,11 +92,11 @@ const SvgContainer:React.FC<Props> = ({
 
         // const xDomain = [ 0, 11 ];
         
-        const xScale = d3.scaleBand<number>()
+        const xScale = scaleBand<number>()
             .range([0, width])
             .domain(xDomain);
 
-        const yScale = d3.scaleLinear()
+        const yScale = scaleLinear()
             .range([height, 0])
             .domain(yDomain);
 
