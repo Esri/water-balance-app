@@ -1,5 +1,9 @@
 import * as React from 'react';
-import * as d3 from 'd3';
+import { 
+    select,
+    line,
+    curveMonotoneX
+} from 'd3';
 
 import {
     GldasIdentifyTaskResultItem
@@ -33,7 +37,7 @@ const Line:React.FC<Props> = ({
     const initContainer = ()=>{
         const { g } = svgContainerData;
 
-        containerG.current = d3.select(g)
+        containerG.current = select(g)
             .append('g')
             .node();
     };
@@ -42,14 +46,14 @@ const Line:React.FC<Props> = ({
 
         const { clipPathId } = svgContainerData;
 
-        const containerGroup = d3.select(containerG.current);
+        const containerGroup = select(containerG.current);
 
         const { x, y, xScaleBand } = scales;
 
         const xOffset = xScaleBand.bandwidth() / 2;
 
-        const valueline = d3.line<GldasIdentifyTaskResultItem>()
-            .curve(d3.curveMonotoneX)
+        const valueline = line<GldasIdentifyTaskResultItem>()
+            .curve(curveMonotoneX)
             .x(d=>x(d.date) - xOffset)
             .y(d=>y(d.value));
 
@@ -77,7 +81,7 @@ const Line:React.FC<Props> = ({
 
     const remove = ()=>{
 
-        const lines = d3.select(containerG.current).selectAll(`.${LinePathClassName}`);
+        const lines = select(containerG.current).selectAll(`.${LinePathClassName}`);
         
         // check the number of existing lines, if greater than 0; remove all existing ones
         if(lines.size()){

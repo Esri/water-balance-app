@@ -1,5 +1,12 @@
 import * as React from 'react';
-import * as d3 from 'd3';
+import { 
+    select,
+    scaleTime,
+    scaleBand,
+    scaleLinear,
+    zoom as d3Zoom,
+    event as d3Event
+} from 'd3';
 import useWindowSize from '../../hooks/useWindowSize';
 import { HeaderHeight } from './Header';
 
@@ -67,7 +74,7 @@ const SvgContainer:React.FC<Props> = ({
             width
         };
 
-        d3.select(container)
+        select(container)
             .append("svg")
                 .attr("width", '100%')
                 .attr("height", height + margin.top + margin.bottom)
@@ -77,7 +84,7 @@ const SvgContainer:React.FC<Props> = ({
                     `translate(${margin.left}, ${margin.top})`
                 );
         
-        const svgSelector = d3.select(container)
+        const svgSelector = select(container)
             .select<SVGElement>('svg');
 
         const chartAreaClip = svgSelector.select('g')
@@ -100,16 +107,16 @@ const SvgContainer:React.FC<Props> = ({
             timeExtent[timeExtent.length - 1]
         ];
         
-        const xScale = d3.scaleTime<number, number>()
+        const xScale = scaleTime<number, number>()
             .range([0, width])
             .domain(xDomain);
 
-        const xScaleBand = d3.scaleBand<number>()
+        const xScaleBand = scaleBand<number>()
             .paddingInner(0.2)
             .range([0, width])
             .domain(timeExtent.map(d=>d.getTime()));
 
-        const yScale = d3.scaleLinear()
+        const yScale = scaleLinear()
             .range([height, 0])
             .domain(yDomain);
 
@@ -151,7 +158,7 @@ const SvgContainer:React.FC<Props> = ({
             [ width, height - margin.top ]
         ];
 
-        svg.call(d3.zoom()
+        svg.call(d3Zoom()
             .scaleExtent([1, 4])
             .translateExtent(extent)
             .extent(extent)
@@ -161,7 +168,7 @@ const SvgContainer:React.FC<Props> = ({
 
     const onZoomed = ()=>{
         const { width } = dimensionRef.current;
-        const newRange = [ 0, width ].map(d => d3.event.transform.applyX(d) as number);
+        const newRange = [ 0, width ].map(d => d3Event.transform.applyX(d) as number);
 
         scales.x.range(newRange);
 
@@ -192,7 +199,7 @@ const SvgContainer:React.FC<Props> = ({
         // d3.select(svg)
         //     .attr("width", newWidth);
         
-        d3.select(`#${ChartClipPathId}`)
+        select(`#${ChartClipPathId}`)
             .select('rect')
             .attr("width", newWidth);
 
@@ -213,7 +220,7 @@ const SvgContainer:React.FC<Props> = ({
     React.useEffect(()=>{
         if(scales && svgContainerData){
             const { svg } = svgContainerData;
-            d3.select(svg).call(zoom);
+            select(svg).call(zoom);
         }
     }, [scales, svgContainerData]);
 

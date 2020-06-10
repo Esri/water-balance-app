@@ -1,12 +1,15 @@
 import './Axis.scss';
 import * as React from 'react';
-import * as d3 from 'd3';
+import { 
+    select,
+    axisBottom,
+    axisLeft
+} from 'd3';
 
 import {
     Scales,
     SvgContainerData
 } from './SvgContainer'
-import { UIConfig } from '../../AppConfig';
 
 interface Props {
     svgContainerData?: SvgContainerData;
@@ -24,12 +27,11 @@ const Axis:React.FC<Props> = ({
 
         const { height } = dimension;
 
-        const mainGroup = d3.select(g);
+        const mainGroup = select(g);
 
         const { x } = scales;
 
-        const xAxis = d3
-            .axisBottom(x)
+        const xAxis = axisBottom(x)
             .tickSizeInner(-(height))
             .tickPadding(7)
 
@@ -58,10 +60,9 @@ const Axis:React.FC<Props> = ({
 
         const { y } = scales;
 
-        const mainGroup = d3.select(g);
+        const mainGroup = select(g);
 
-        const yAxis = d3
-            .axisLeft(y)
+        const yAxis = axisLeft(y)
             .ticks(9)
             .tickSizeInner(-(width))
             .tickPadding(5)

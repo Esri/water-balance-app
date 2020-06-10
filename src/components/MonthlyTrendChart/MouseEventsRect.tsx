@@ -1,5 +1,5 @@
 import * as React from 'react';
-import * as d3 from 'd3';
+import { select, mouse } from 'd3';
 
 import {
     Scales,
@@ -33,11 +33,11 @@ const MouseEventsRect:React.FC<Props> = ({
 
         const { g, height, width } = svgContainerData;
 
-        containerG.current = d3.select(g)
+        containerG.current = select(g)
             .append('g')
             .node();
         
-        const container = d3.select(containerG.current);
+        const container = select(containerG.current);
 
         container.append('line')
             .attr('class', VerticalRefLineClassName)
@@ -58,7 +58,7 @@ const MouseEventsRect:React.FC<Props> = ({
                 setItemOnHover(undefined);
             })
             .on("mousemove", function(){
-                const mousePosX = d3.mouse(this)[0];
+                const mousePosX = mouse(this)[0];
                 getItemByMousePos(mousePosX);
                 setItemOnHover(getItemByMousePos(mousePosX));
             });
@@ -76,7 +76,7 @@ const MouseEventsRect:React.FC<Props> = ({
 
         const item = itemOnHover.current;
 
-        const vRefLine = d3.select(containerG.current)
+        const vRefLine = select(containerG.current)
             .select(`.${VerticalRefLineClassName}`);
 
         const xPos = item ? 

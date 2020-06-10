@@ -4,6 +4,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const TerserPlugin = require('terser-webpack-plugin');
 const OptimizeCSSAssets = require('optimize-css-assets-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports =  (env, options)=> {
 
@@ -16,7 +17,7 @@ module.exports =  (env, options)=> {
             filename: '[name].[contenthash].js',
             chunkFilename: '[name].[contenthash].js',
         },
-        devtool: 'source-map',
+        devtool: devMode ? 'source-map' : 'none',
         resolve: {
             extensions: ['.js', '.jsx', '.json', '.ts', '.tsx']
         },
@@ -24,7 +25,7 @@ module.exports =  (env, options)=> {
             rules: [
                 {
                     test: /\.(ts|tsx)$/,
-                    loader: 'ts-loader'
+                    loader: 'babel-loader'
                 },
                 {
                     test: /\.s?[ac]ss$/,
@@ -93,7 +94,8 @@ module.exports =  (env, options)=> {
                     useShortDoctype                : true
                 }
             }),
-            new CleanWebpackPlugin()
+            new CleanWebpackPlugin(),
+            // new BundleAnalyzerPlugin()
         ],
         optimization: {
             splitChunks: {

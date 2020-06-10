@@ -1,5 +1,9 @@
 import * as React from 'react';
-import * as d3 from 'd3';
+import { 
+    select,
+    stack,
+    area as d3Area
+} from 'd3';
 
 import {
     GldasIdentifyTaskResultItem
@@ -40,7 +44,7 @@ const StackedArea:React.FC<Props> = ({
     const initContainer = ()=>{
         const { g } = svgContainerData;
 
-        containerG.current = d3.select(g)
+        containerG.current = select(g)
             .append('g')
             .node();
     };
@@ -64,11 +68,11 @@ const StackedArea:React.FC<Props> = ({
             }
         });
 
-        const series = d3.stack<CombinedData>()
+        const series = stack<CombinedData>()
             .keys([ 'Soil Moisture', 'Snowpack' ])(combinedData);
         // console.log(series)
 
-        const area = d3.area<{
+        const area = d3Area<{
             0: number;
             1: number;
             data: CombinedData
@@ -79,7 +83,7 @@ const StackedArea:React.FC<Props> = ({
 
         remove();
 
-        d3.select(containerG.current)
+        select(containerG.current)
             .append('g')
             .attr('class', AreaPathClassName)
             .attr("clip-path", `url(#${clipPathId})`)
@@ -97,7 +101,7 @@ const StackedArea:React.FC<Props> = ({
 
     const remove = ()=>{
 
-        const areas = d3.select(containerG.current)
+        const areas = select(containerG.current)
             .select(`.${AreaPathClassName}`);
         
         if(areas.size()){

@@ -18,7 +18,7 @@ export type GldasIdentifyTaskResultsByMonth = {
     [key in GldasLayerName]?: GldasIdentifyTaskResultItem[][]
 };
 
-const GldasLayerName = Object.keys(GldasLayersInfo) as GldasLayerName[];
+const GldasLayerNames = Object.keys(GldasLayersInfo) as GldasLayerName[];
 
 let timeExtentForGldasLayers:Date[] = [];
 
@@ -72,7 +72,7 @@ export const getGLDASdata = async(queryLocation: IPoint):Promise<{
         f: 'json'
     };
 
-    const identifyTasks = GldasLayerName.map(layerName=>{
+    const identifyTasks = GldasLayerNames.map(layerName=>{
 
         const layerInfo = GldasLayersInfo[layerName];
 
@@ -88,12 +88,18 @@ export const getGLDASdata = async(queryLocation: IPoint):Promise<{
 
         Promise.all(identifyTasks)
         .then((responses)=>{
+
+            if(responses[0].data && responses[0].data.value === 'NoData'){
+                reject({
+                    error: 'failed to fetch GLDAS data'
+                });
+            }
             
             const identifyResults:GldasIdentifyTaskResults = {}
 
             for ( let i = 0, len = responses.length; i < len; i++){
                 
-                const layerName = GldasLayerName[i];
+                const layerName = GldasLayerNames[i];
 
                 const response = responses[i];
 
@@ -155,7 +161,7 @@ const groupGldasDataByMonth = (data:GldasIdentifyTaskResults)=>{
 
         const monthIndex = timeExtentForGldasLayers[i].getMonth();
 
-        GldasLayerName.forEach(layerName=>{
+        GldasLayerNames.forEach(layerName=>{
             const value = data[layerName][i];
 
             if(!results[layerName]){

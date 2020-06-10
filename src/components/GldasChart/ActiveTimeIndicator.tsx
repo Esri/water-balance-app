@@ -1,5 +1,5 @@
 import * as React from 'react';
-import * as d3 from 'd3';
+import { select } from 'd3';
 import { format } from 'date-fns';
 
 import {
@@ -41,11 +41,11 @@ const ActiveTimeIndicator:React.FC<Props> = ({
 
         const { height } = dimension;
 
-        containerG.current = d3.select(g)
+        containerG.current = select(g)
             .append('g')
             .node();
         
-        const container = d3.select(containerG.current);
+        const container = select(containerG.current);
 
         container.append('line')
             .attr('class', IndicatorLineClassName)
@@ -83,7 +83,7 @@ const ActiveTimeIndicator:React.FC<Props> = ({
 
         const { xScaleBand } = scales;
 
-        const container = d3.select(containerG.current);
+        const container = select(containerG.current);
 
         const xPos = xScaleBand(activeTime.getTime()) + xScaleBand.bandwidth() / 2;
 

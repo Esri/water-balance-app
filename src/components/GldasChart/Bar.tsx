@@ -1,5 +1,5 @@
 import * as React from 'react';
-import * as d3 from 'd3';
+import { select } from 'd3';
 
 import {
     GldasIdentifyTaskResultItem
@@ -36,7 +36,7 @@ const Bar:React.FC<Props> = ({
     const initContainer = ()=>{
         const { g } = svgContainerData;
 
-        containerG.current = d3.select(g)
+        containerG.current = select(g)
             .append('g')
             .node();
     };
@@ -52,7 +52,7 @@ const Bar:React.FC<Props> = ({
 
         remove();
 
-        d3.select(containerG.current)
+        select(containerG.current)
             .append('g')
             .attr('class', BarRectGroupClassName)
             .attr("clip-path", `url(#${clipPathId})`)
@@ -82,7 +82,7 @@ const Bar:React.FC<Props> = ({
 
     const remove = ()=>{
 
-        const existingBars = d3.select(containerG.current)
+        const existingBars = select(containerG.current)
             .selectAll(`.${BarRectGroupClassName}`);
 
         if (existingBars.size()) {
