@@ -153,7 +153,7 @@ const App:React.FC<Props> = ({
                     onChange={setActiveLayer}
                 />
 
-                <Legend />
+                {/* <Legend /> */}
 
             </MapView>
             
