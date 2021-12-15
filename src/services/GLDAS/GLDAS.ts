@@ -64,7 +64,13 @@ export const getGLDASdata = async(queryLocation: IPoint):Promise<{
     }
 
     const params = {
-        geometry: queryLocation.toJSON(), //{"x":-9755306.160227587,"y":4549146.018149606,"spatialReference":{"wkid":102100}},
+        geometry: {
+            x: queryLocation.longitude,
+            y: queryLocation.latitude,
+            spatialReference: {
+                wkid: 4326
+            }
+        }, //{"x":-9755306.160227587,"y":4549146.018149606,"spatialReference":{"wkid":102100}},
         returnGeometry: 'false',
         returnCatalogItems: 'true',
         renderingRule: {"rasterFunction":"None"},
