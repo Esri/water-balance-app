@@ -1,7 +1,7 @@
 export const MapConfig = {
-    // "web-map-id": "0af083ed3ed5482394bb274e5a51d910"
-    // webmap with blend mode on it
-    "web-map-id": "4b9cced10ff1401ba15bf6f14c8232bc"
+    "web-map-id": "fccbb69d8644430894d3cefc50102dd9"
+    // // webmap with blend mode on it made by Sean
+    // "web-map-id": "4b9cced10ff1401ba15bf6f14c8232bc"
 };
 
 export const UIConfig = {
