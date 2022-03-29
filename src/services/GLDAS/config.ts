@@ -70,3 +70,30 @@ export const GldasLayersInfo: Record<GldasLayerName, GldasLayerInfo> = {
         }
     }
 };
+
+export const GldasLayersInfoDEV: typeof GldasLayersInfo = {
+    "Change in Storage": {
+        ...GldasLayersInfo['Change in Storage'],
+        url: 'https://utilitydevext.arcgis.com/sharing/servers/f511627378ee49ee9c495b674e4c8fc2/rest/services/GLDAS_StorageChange/ImageServer'
+    },
+    "Runoff": {
+        ...GldasLayersInfo['Runoff'],
+        url: 'https://utilitydevext.arcgis.com/sharing/servers/3d0579583dbd46909903dec46ba2fa77/rest/services/GLDAS_Runoff/ImageServer'
+    },
+    "Soil Moisture": {
+        ...GldasLayersInfo['Soil Moisture'],
+        url: 'https://utilitydevext.arcgis.com/sharing/servers/cc648ec9c40342cc805be9b1d07184e9/rest/services/GLDAS_SoilMoisture/ImageServer'
+    },
+    "Precipitation": {
+        ...GldasLayersInfo['Precipitation'],
+        url: 'https://utilitydevext.arcgis.com/sharing/servers/21aee7a24ceb4104bf1cad1b868df72d/rest/services/GLDAS_Precipitation/ImageServer'
+    },
+    "Evapotranspiration": {
+        ...GldasLayersInfo['Evapotranspiration'],
+        url: 'https://utilitydevext.arcgis.com/sharing/servers/e462322a598c47d38cde5c01b75bc054/rest/services/GLDAS_Evapotranspiration/ImageServer'
+    },
+    "Snowpack": {
+        ...GldasLayersInfo['Snowpack'],
+        url: 'https://utilitydevext.arcgis.com/sharing/servers/88ae6caa9efc433fbfe4342dc7d7a21e/rest/services/GLDAS_Snowpack/ImageServer'
+    }
+};

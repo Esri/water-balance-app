@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { GldasLayersInfo } from './config';
+import { GldasLayersInfo, GldasLayersInfoDEV } from './config';
 import { GldasLayerName } from '../../types';
 
 import IPoint from 'esri/geometry/Point';
@@ -22,9 +22,13 @@ const GldasLayerNames = Object.keys(GldasLayersInfo) as GldasLayerName[];
 
 let timeExtentForGldasLayers:Date[] = [];
 
+const LayersInfo = location.host === 'livingatlasdev.arcgis.com' 
+    ? GldasLayersInfoDEV 
+    : GldasLayersInfo;
+
 export const getTimeExtent = async(): Promise<Date[]>=>{
 
-    const url = GldasLayersInfo['Snowpack'].url + '/multiDimensionalInfo?f=json';
+    const url = LayersInfo['Snowpack'].url + '/multiDimensionalInfo?f=json';
 
     try {
         const response = await axios.get(url);
@@ -80,7 +84,7 @@ export const getGLDASdata = async(queryLocation: IPoint):Promise<{
 
     const identifyTasks = GldasLayerNames.map(layerName=>{
 
-        const layerInfo = GldasLayersInfo[layerName];
+        const layerInfo = LayersInfo[layerName];
 
         return axios.get(layerInfo.url + '/identify', { 
             params: {
