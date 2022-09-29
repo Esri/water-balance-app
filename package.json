@@ -60,7 +60,7 @@
     "axios": "^0.21.1",
     "calcite-react": "^0.51.1",
     "calcite-web": "github:Esri/calcite-web#v1.2.5",
-    "d3": "^5.16.0",
+    "d3": "^7.6.1",
     "date-fns": "^2.14.0",
     "esri-loader": "^3.3.0",
     "helper-toolkit-ts": "^1.1.10",
