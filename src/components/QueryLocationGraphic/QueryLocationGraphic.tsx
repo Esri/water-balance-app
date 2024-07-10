@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { loadModules } from 'esri-loader';
+// import { loadModules } from 'esri-loader';
 
-import IMapView from 'esri/views/MapView';
-import IPoint from 'esri/geometry/Point';
-import IGraphic from 'esri/Graphic';
-import ISimpleMarkerSymbol from 'esri/symbols/SimpleMarkerSymbol';
+import IMapView from '@arcgis/core/views/MapView';
+import IPoint from '@arcgis/core/geometry/Point';
+import Graphic from '@arcgis/core/Graphic';
+import SimpleMarkerSymbol from '@arcgis/core/symbols/SimpleMarkerSymbol';
 import { UIConfig } from '../../AppConfig';
 
 interface Props {
@@ -18,19 +18,19 @@ const QueryLocationGraphic:React.FC<Props> = ({
 })=>{
 
     const draw = async()=>{
-        type Modules = [
-            typeof IGraphic, 
-            typeof ISimpleMarkerSymbol
-        ]; 
+        // type Modules = [
+        //     typeof IGraphic, 
+        //     typeof ISimpleMarkerSymbol
+        // ]; 
 
         try {
-            const [ 
-                Graphic, 
-                SimpleMarkerSymbol
-            ] = await (loadModules([
-                'esri/Graphic',
-                'esri/symbols/SimpleMarkerSymbol',
-            ]) as Promise<Modules>);
+            // const [ 
+            //     Graphic, 
+            //     SimpleMarkerSymbol
+            // ] = await (loadModules([
+            //     'esri/Graphic',
+            //     'esri/symbols/SimpleMarkerSymbol',
+            // ]) as Promise<Modules>);
 
             const queryLocationGraphic = new Graphic({
                 geometry,

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import shortid from 'shortid';
+// import shortid from 'shortid';
 
 // import Select from 'calcite-react/Select';
 // import { MenuItem } from 'calcite-react/Menu';
@@ -11,33 +11,33 @@ import {
 } from '../../AppConfig';
 
 interface MenuItemData {
-    key: string;
+    // key: string;
     value: GldasLayerName;
 };
 
 const Data: MenuItemData[] = [
     {
-        key: shortid.generate(),
+        // key: shortid.generate(),
         value: 'Soil Moisture'
     },
     {
-        key: shortid.generate(),
+        // key: shortid.generate(),
         value: 'Snowpack'
     },
     {
-        key: shortid.generate(),
+        // key: shortid.generate(),
         value: 'Precipitation'
     },
     {
-        key: shortid.generate(),
+        // key: shortid.generate(),
         value: 'Evapotranspiration'
     },
     {
-        key: shortid.generate(),
+        // key: shortid.generate(),
         value: 'Runoff'
     },
     {
-        key: shortid.generate(),
+        // key: shortid.generate(),
         value: 'Change in Storage'
     }
 ];

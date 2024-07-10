@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { loadModules } from 'esri-loader';
+// import { loadModules } from 'esri-loader';
 
-import IMapView from 'esri/views/MapView';
-import ILegend from 'esri/widgets/Legend';
+import IMapView from '@arcgis/core/views/MapView';
+import Legend from '@arcgis/core/widgets/Legend';
 
 interface Props {
     mapView?: IMapView;
@@ -13,14 +13,14 @@ const LegendWidget:React.FC<Props> = ({
 })=>{
 
     const init = async()=>{
-        type Modules = [typeof ILegend];
+        // type Modules = [typeof ILegend];
 
         try {
-            const [ 
-                Legend, 
-            ] = await (loadModules([
-                'esri/widgets/Legend',
-            ]) as Promise<Modules>);
+            // const [ 
+            //     Legend, 
+            // ] = await (loadModules([
+            //     'esri/widgets/Legend',
+            // ]) as Promise<Modules>);
 
             const legend = new Legend({
                 view: mapView

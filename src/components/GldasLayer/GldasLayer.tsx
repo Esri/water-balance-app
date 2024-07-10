@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { add } from 'date-fns';
 
-import { loadModules } from 'esri-loader';
-import IMapView from 'esri/views/MapView';
-import ITimeExtent from "esri/TimeExtent";
+// import { loadModules } from 'esri-loader';
+import IMapView from '@arcgis/core/views/MapView';
+import TimeExtent from "@arcgis/core/TimeExtent";
 
 import {
     GldasLayerName
@@ -37,13 +37,13 @@ const GldasLayer:React.FC<Props> = ({
             return;
         }
 
-        type Modules = [typeof ITimeExtent];
+        // type Modules = [typeof ITimeExtent];
 
-        const [ 
-            TimeExtent
-        ] = await (loadModules([
-            'esri/TimeExtent',
-        ]) as Promise<Modules>);
+        // const [ 
+        //     TimeExtent
+        // ] = await (loadModules([
+        //     'esri/TimeExtent',
+        // ]) as Promise<Modules>);
 
         const start = new Date(selectedTimeExtentItem.date);
         const end = add(start, { days: 1});

@@ -1,9 +1,9 @@
 import * as React from 'react';
 
-import { loadModules, loadCss } from 'esri-loader';
-import IMapView from 'esri/views/MapView';
-import IWebMap from "esri/WebMap";
-import IPoint from 'esri/geometry/Point';
+// import { loadModules, loadCss } from 'esri-loader';
+import ArcGISMapView from '@arcgis/core/views/MapView';
+import WebMap from "@arcgis/core/WebMap";
+import IPoint from '@arcgis/core/geometry/Point';
 
 import {
     MapConfig,
@@ -24,22 +24,22 @@ const MapView:React.FC<Props> = ({
 
     const mapDivRef = React.useRef<HTMLDivElement>();
 
-    const [ mapView, setMapView] = React.useState<IMapView>(null);
+    const [ mapView, setMapView] = React.useState<ArcGISMapView>(null);
 
     const initMapView = async()=>{
         
-        type Modules = [typeof IMapView, typeof IWebMap];
+        // type Modules = [typeof IMapView, typeof IWebMap];
 
         try {
-            const [ 
-                MapView, 
-                WebMap 
-            ] = await (loadModules([
-                'esri/views/MapView',
-                'esri/WebMap',
-            ]) as Promise<Modules>);
+            // const [ 
+            //     MapView, 
+            //     WebMap 
+            // ] = await (loadModules([
+            //     'esri/views/MapView',
+            //     'esri/WebMap',
+            // ]) as Promise<Modules>);
 
-            const view = new MapView({
+            const view = new ArcGISMapView({
                 container: mapDivRef.current,
                 map: new WebMap({
                     portalItem: {
@@ -69,7 +69,7 @@ const MapView:React.FC<Props> = ({
     };
 
     React.useEffect(()=>{
-        loadCss();
+        // loadCss();
         initMapView();
     }, []);
 
