@@ -125,6 +125,10 @@ const App:React.FC<Props> = ({
         }
     }, [ timeExtentForGldasLayers ]);
 
+    React.useEffect(()=>{
+        console.log(activeLayer)
+    }, [activeLayer])
+
     return selectedTimeExtentItem ? (
         <>
             <TopNav 

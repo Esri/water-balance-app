@@ -1,9 +1,9 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
-import {
-    CalciteH4
-} from 'calcite-react/Elements'
+// import {
+//     CalciteH4
+// } from 'calcite-react/Elements'
 
 import {
     UIConfig
@@ -23,7 +23,8 @@ const TopNavContainer = styled.div`
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 `;
 
-const TitleText = styled(CalciteH4)`
+const TitleText = styled.div`
+    font-size: 1.25rem;
     margin: 0;
     padding-right: .75rem;
     margin-right: .75rem;

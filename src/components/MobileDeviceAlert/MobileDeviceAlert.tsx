@@ -1,5 +1,5 @@
 import * as React from 'react';
-import Alert, { AlertTitle, AlertMessage } from 'calcite-react/Alert'
+// import Alert, { AlertTitle, AlertMessage } from 'calcite-react/Alert'
 
 interface Props {
     isVisible?: boolean;
@@ -16,9 +16,13 @@ const MobileDeviceAlert:React.FC<Props> = ({
                 'bottom': 0
             }}
         >
-            <Alert yellow showIcon>
+            {/* <Alert yellow showIcon>
                 <AlertMessage>Run this app on your devices with wider screen to see the interactive components</AlertMessage>
-            </Alert>
+            </Alert> */}
+
+            <calcite-alert open label="A report alert" kind="info">
+                <div slot="message">Run this app on your devices with wider screen to see the interactive components</div>
+            </calcite-alert>
         </div>
     ) : null;
 };

@@ -2,9 +2,8 @@ const path = require('path');
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const TerserPlugin = require('terser-webpack-plugin');
-const OptimizeCSSAssets = require('optimize-css-assets-webpack-plugin');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
+// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports =  (env, options)=> {
 
@@ -32,39 +31,25 @@ module.exports =  (env, options)=> {
                     use: [
                         devMode ? 'style-loader' : MiniCssExtractPlugin.loader,
                         {
-                            loader: "css-loader", options: {
+                            loader: "css-loader", 
+                            options: {
                                 sourceMap: true
                             }
-                        }, {
-                            loader: 'resolve-url-loader',
-                        }, {
-                            loader: "sass-loader", options: {
-                                sourceMap: true
-                            }
-                        }
+                        }, 
                     ]
                 },
-                { test: /\.woff$/, loader: "url-loader?limit=10000&mimetype=application/font-woff" },
-                { test: /\.ttf$/,  loader: "url-loader?limit=10000&mimetype=application/octet-stream" },
-                { test: /\.eot$/,  loader: "file-loader" },
                 { 
-                    test: /\.svg$/,  
-                    loader: "url-loader",
+                    test: /\.(woff|woff2|ttf|eot)$/,  
+                    loader: "file-loader",
                     options: {
-                        limit: 10000,
-                        fallback: {
-                            loader: "file-loader"
-                        }
+                        name: '[name].[contenthash].[ext]',
                     }
                 },
-                {   
-                    test: /\.(png|jpg|gif)$/,  
-                    loader: "url-loader",
+                { 
+                    test: /\.(png|jpg|gif|svg)$/,  
+                    loader: "file-loader",
                     options: {
-                        limit: 10000,
-                        fallback: {
-                            loader: "file-loader"
-                        }
+                        name: '[name].[contenthash].[ext]',
                     }
                 },
             ]
@@ -94,24 +79,24 @@ module.exports =  (env, options)=> {
                     useShortDoctype                : true
                 }
             }),
-            new CleanWebpackPlugin(),
+            // new CleanWebpackPlugin(),
             // new BundleAnalyzerPlugin()
         ],
         optimization: {
-            splitChunks: {
-                cacheGroups: {
-                    default: false,
-                    vendors: false,
-                    // vendor chunk
-                    vendor: {
-                        // sync + async chunks
-                        chunks: 'all',
-                        name: 'vendor',
-                        // import file path containing node_modules
-                        test: /node_modules/
-                    }
-                }
-            },
+            // splitChunks: {
+            //     cacheGroups: {
+            //         default: false,
+            //         vendors: false,
+            //         // vendor chunk
+            //         vendor: {
+            //             // sync + async chunks
+            //             chunks: 'all',
+            //             name: 'vendor',
+            //             // import file path containing node_modules
+            //             test: /node_modules/
+            //         }
+            //     }
+            // },
             minimizer: [
                 new TerserPlugin({
                     extractComments: true,
@@ -121,7 +106,7 @@ module.exports =  (env, options)=> {
                         }
                     }
                 }), 
-                new OptimizeCSSAssets({})
+                new CssMinimizerPlugin()
             ]
         },
     }

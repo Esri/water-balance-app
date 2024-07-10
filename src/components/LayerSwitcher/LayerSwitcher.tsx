@@ -2,8 +2,8 @@ import * as React from 'react';
 import styled from 'styled-components';
 import shortid from 'shortid';
 
-import Select from 'calcite-react/Select';
-import { MenuItem } from 'calcite-react/Menu';
+// import Select from 'calcite-react/Select';
+// import { MenuItem } from 'calcite-react/Menu';
 
 import { GldasLayerName } from '../../types';
 import {
@@ -42,9 +42,9 @@ const Data: MenuItemData[] = [
     }
 ];
 
-const StyledSelect = styled(Select)`
+const StyledSelect = styled.div`
     position: absolute;
-    top: 10px;
+    top: 65px;
     left: 60px;
     width: 198px;
     background-color: ${UIConfig["theme-color-dark-blue"]};
@@ -62,29 +62,30 @@ const LayerSwitcher:React.FC<Props> = ({
     onChange
 })=>{
 
-    const getMenuItems = ()=>{
-        return Data.map(d=>{
+    const calciteSelectRef = React.useRef<any>()
 
-            const { key, value } = d;
 
-            return (
-                <MenuItem 
-                    key={key}
-                    value={value}
-                >
-                    {value}
-                </MenuItem>
-            )
-        });
-    }
+    React.useEffect(()=>{
+        calciteSelectRef.current.addEventListener('calciteSelectChange', (evt:any)=>{
+            onChange(evt.target.value)
+        })
+    }, [])
 
     return (
-        <StyledSelect
-            onChange={onChange}
-            selectedValue={activeLayer}
-        >
-            { getMenuItems() }
+        <StyledSelect>
+            <calcite-select
+                ref={calciteSelectRef}
+            >
+                {
+                    Data.map(d=>{
+                        return (
+                            <calcite-option key={d.value} value={d.value}>{d.value}</calcite-option>
+                        )
+                    })
+                }
+            </calcite-select>
         </StyledSelect>
+
     );
 };
 
