@@ -27,7 +27,8 @@ module.exports =  (env, options)=> {
                     loader: 'babel-loader'
                 },
                 {
-                    test: /\.s?[ac]ss$/,
+                    test: /\.css$/i,
+                    // include: path.resolve(__dirname, 'src'),
                     use: [
                         devMode ? 'style-loader' : MiniCssExtractPlugin.loader,
                         {
@@ -36,7 +37,10 @@ module.exports =  (env, options)=> {
                                 sourceMap: true
                             }
                         }, 
-                    ]
+                        {
+                            loader: 'postcss-loader'
+                        }
+                    ],
                 },
                 { 
                     test: /\.(woff|woff2|ttf|eot)$/,  
