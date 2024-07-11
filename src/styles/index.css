@@ -21,3 +21,7 @@
 .cursor-pointer{
     cursor: pointer;
 }
+
+#root .esri-view-root {
+    --esri-view-outline: 0;
+}
