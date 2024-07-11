@@ -10,7 +10,7 @@ import { HeaderHeight } from './Header';
 
 import {
     GldasIdentifyTaskResultItem
-} from '../../services/GLDAS/gldas';
+} from '../../services/GLDAS/GLDAS';
 
 import {
     UIConfig

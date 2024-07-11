@@ -3,7 +3,7 @@ import axios from 'axios';
 import { GldasLayersInfo, GldasLayersInfoDEV } from './config';
 import { GldasLayerName } from '../../types';
 
-import IPoint from 'esri/geometry/Point';
+import IPoint from '@arcgis/core/geometry/Point';
 
 export interface GldasIdentifyTaskResultItem {
     date: Date;

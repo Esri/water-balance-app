@@ -3,7 +3,7 @@ import { select } from 'd3';
 
 import {
     GldasIdentifyTaskResultItem
-} from '../../services/GLDAS/gldas';
+} from '../../services/GLDAS/GLDAS';
 
 import {
     Scales,

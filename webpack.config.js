@@ -4,6 +4,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const TerserPlugin = require('terser-webpack-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 module.exports =  (env, options)=> {
 
@@ -59,6 +60,8 @@ module.exports =  (env, options)=> {
             ]
         },
         plugins: [
+            // need to use ForkTsCheckerWebpackPlugin because Babel loader ignores the compilation errors for Typescript
+            new ForkTsCheckerWebpackPlugin(),
             new MiniCssExtractPlugin({
                 // Options similar to the same options in webpackOptions.output
                 // both options are optional

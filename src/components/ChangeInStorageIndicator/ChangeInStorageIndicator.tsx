@@ -5,7 +5,7 @@ import { max, min } from 'd3';
 import {
     GldasIdentifyTaskResults,
     GldasIdentifyTaskResultsByMonth
-} from '../../services/GLDAS/gldas';
+} from '../../services/GLDAS/GLDAS';
 
 import {
     TimeExtentItem

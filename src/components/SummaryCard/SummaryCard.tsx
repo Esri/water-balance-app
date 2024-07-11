@@ -63,7 +63,8 @@ const SummaryCard:React.FC<Props> = ({
         for(let i = 0, len = allDates.length; i < len; i++){
 
             const gldasValues = keys.map((key)=>{
-                return data[key][i].value
+                const d = data as any
+                return d[key][i].value
             })
 
             const rowStr = [
