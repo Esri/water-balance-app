@@ -1,5 +1,5 @@
 import * as React from 'react';
-import IPoint from 'esri/geometry/Point';
+import IPoint from '@arcgis/core/geometry/Point';
 
 import {
     AppContext

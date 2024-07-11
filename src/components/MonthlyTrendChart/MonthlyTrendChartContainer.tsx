@@ -1,10 +1,10 @@
 import * as React from 'react';
-import styled from 'styled-components';
+// import styled from 'styled-components';
 import { max, min } from 'd3';
 
 import {
     GldasIdentifyTaskResultsByMonth
-} from '../../services/GLDAS/gldas';
+} from '../../services/GLDAS/GLDAS';
 
 import {
     GldasLayerName
@@ -21,15 +21,15 @@ import MouseEventsRect, { MouseEventItem } from './MouseEventsRect';
 import Tooltip from './Tooltip';
 import Header from './Header';
 
-import useWindowSize from '../../hooks/useWindowSize';
+// import useWindowSize from '../../hooks/useWindowSize';
 
-const ContainerDiv = styled.div`
-    position: relative;
-    flex-grow: 0;
-    flex-shrink: 0;
-    width: 375px;
-    height: 100%;
-`;
+// const ContainerDiv = styled.div`
+//     position: relative;
+//     flex-grow: 0;
+//     flex-shrink: 0;
+//     width: 375px;
+//     height: 100%;
+// `;
 
 interface Props {
     data: GldasIdentifyTaskResultsByMonth;
@@ -45,7 +45,7 @@ const MonthlyTrendChart:React.FC<Props> = ({
 
     const [ itemOnHover, setItemOnHOver ] = React.useState<MouseEventItem>();
 
-    const [ windowWidth ] = useWindowSize();
+    // const [ windowWidth ] = useWindowSize();
 
     const getXDomain = ()=>{
         if(!data){
@@ -86,39 +86,48 @@ const MonthlyTrendChart:React.FC<Props> = ({
         return data[activeLayer];
     };
 
-    return windowWidth >= 1200 ? (
-        <ContainerDiv>
-            <Header 
+    return (
+        <div
+            className='relative hidden lg:block flex-grow-0 flex-shrink-0 h-full w-[375px]'
+            // style={{
+            //     position: 'relative',
+            //     flexGrow: 0,
+            //     flexShrink: 0,
+            //     width: 375,
+            //     height: '100%'
+            // }}
+        >
+        <Header 
+            activeLayer={activeLayer}
+            timeExtentItem={timeExtentItem}
+        />
+
+        <SvgContainer
+            xDomain={getXDomain()}
+            yDomain={getYDomain()}
+        >
+
+            <Lines 
+                data={getDataForLines()}
                 activeLayer={activeLayer}
-                timeExtentItem={timeExtentItem}
+                index4SelectedMonth={timeExtentItem ? timeExtentItem.date.getMonth() : -1}
             />
 
-            <SvgContainer
-                xDomain={getXDomain()}
-                yDomain={getYDomain()}
-            >
+            <Axis />
 
-                <Lines 
-                    data={getDataForLines()}
-                    activeLayer={activeLayer}
-                    index4SelectedMonth={timeExtentItem ? timeExtentItem.date.getMonth() : -1}
-                />
+            <Tooltip 
+                data={getDataForLines()}
+                itemOnHover={itemOnHover}
+                selectedDate={timeExtentItem?.date}
+            />
 
-                <Axis />
+            <MouseEventsRect 
+                onHover={setItemOnHOver}
+            />
 
-                <Tooltip 
-                    data={getDataForLines()}
-                    itemOnHover={itemOnHover}
-                    selectedDate={timeExtentItem?.date}
-                />
-
-                <MouseEventsRect 
-                    onHover={setItemOnHOver}
-                />
-
-            </SvgContainer>
-        </ContainerDiv>
-    ) : null;
+        </SvgContainer>
+    </div>
+    )
 };
 
 export default MonthlyTrendChart;

@@ -45,6 +45,7 @@ interface Dimension {
 interface Props {
     xDomain?: number[];
     yDomain?: number[];
+    children?: React.ReactNode
 };
 
 const SvgContainer:React.FC<Props> = ({

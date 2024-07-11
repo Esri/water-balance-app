@@ -5,7 +5,7 @@ import { format } from 'date-fns';
 import {
     GldasIdentifyTaskResults,
     GldasIdentifyTaskResultsByMonth
-} from '../../services/GLDAS/gldas';
+} from '../../services/GLDAS/GLDAS';
 
 import {
     TimeExtentItem
@@ -62,7 +62,7 @@ const SummaryCard:React.FC<Props> = ({
 
         for(let i = 0, len = allDates.length; i < len; i++){
 
-            const gldasValues = keys.map(key=>{
+            const gldasValues = keys.map((key)=>{
                 return data[key][i].value
             })
 

@@ -46,6 +46,7 @@ export interface SvgContainerData {
 interface Props {
     timeExtent?: Date[];
     yDomain?: number[];
+    children?: React.ReactNode
 };
 
 const SvgContainer:React.FC<Props> = ({

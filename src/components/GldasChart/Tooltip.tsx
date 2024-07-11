@@ -16,7 +16,7 @@ import {
 
 import {
     GldasIdentifyTaskResults
-} from '../../services/GLDAS/gldas';
+} from '../../services/GLDAS/GLDAS';
 
 import {
     UIConfig

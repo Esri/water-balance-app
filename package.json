@@ -4,9 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "test": "jest --passWithNoTests",
     "start": "webpack-dev-server --mode development --open",
     "dev": "webpack --mode development",
-    "build": "webpack --mode production"
+    "build": "webpack --mode production",
+    "prepare": "husky install"
   },
   "repository": {
     "type": "git",
@@ -19,6 +21,13 @@
     "url": "https://github.com/vannizhang/{project-name}/issues"
   },
   "homepage": "https://github.com/vannizhang/{project-name}#readme",
+  "lint-staged": {
+    "src/**/*.{ts,tsx,json}": [
+      "prettier --write",
+      "eslint src --fix",
+      "jest --bail --findRelatedTests --passWithNoTests"
+    ]
+  },
   "devDependencies": {
     "@babel/core": "^7.14.6",
     "@babel/plugin-proposal-class-properties": "^7.10.4",
