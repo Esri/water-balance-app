@@ -74,26 +74,26 @@ export const GldasLayersInfo: Record<GldasLayerName, GldasLayerInfo> = {
 export const GldasLayersInfoDEV: typeof GldasLayersInfo = {
     "Change in Storage": {
         ...GldasLayersInfo['Change in Storage'],
-        url: 'https://utilitydevext.arcgis.com/sharing/servers/f511627378ee49ee9c495b674e4c8fc2/rest/services/GLDAS_StorageChange/ImageServer'
+        url: 'https://utilitydevext.arcgis.com/sharing/servers/1b033b8cad2848ceb1d55f6ebd98ca9a/rest/services/GLDAS_StorageChange/ImageServer'
     },
     "Runoff": {
         ...GldasLayersInfo['Runoff'],
-        url: 'https://utilitydevext.arcgis.com/sharing/servers/3d0579583dbd46909903dec46ba2fa77/rest/services/GLDAS_Runoff/ImageServer'
+        url: 'https://utilitydevext.arcgis.com/sharing/servers/aa8506f99f7a4c218c2cdd75cabe9f95/rest/services/GLDAS_Runoff/ImageServer'
     },
     "Soil Moisture": {
         ...GldasLayersInfo['Soil Moisture'],
-        url: 'https://utilitydevext.arcgis.com/sharing/servers/cc648ec9c40342cc805be9b1d07184e9/rest/services/GLDAS_SoilMoisture/ImageServer'
+        url: 'https://utilitydevext.arcgis.com/sharing/servers/c46c287b048349d8af87974e1d0fcb28/rest/services/GLDAS_SoilMoisture/ImageServer'
     },
     "Precipitation": {
         ...GldasLayersInfo['Precipitation'],
-        url: 'https://utilitydevext.arcgis.com/sharing/servers/21aee7a24ceb4104bf1cad1b868df72d/rest/services/GLDAS_Precipitation/ImageServer'
+        url: 'https://utilitydevext.arcgis.com/sharing/servers/807e4f60395c415ea1830a45f0419378/rest/services/GLDAS_Precipitation/ImageServer'
     },
     "Evapotranspiration": {
         ...GldasLayersInfo['Evapotranspiration'],
-        url: 'https://utilitydevext.arcgis.com/sharing/servers/e462322a598c47d38cde5c01b75bc054/rest/services/GLDAS_Evapotranspiration/ImageServer'
+        url: 'https://utilitydevext.arcgis.com/sharing/servers/faef9e6212634f098c789d41db9dc5c1/rest/services/GLDAS_Evapotranspiration/ImageServer'
     },
     "Snowpack": {
         ...GldasLayersInfo['Snowpack'],
-        url: 'https://utilitydevext.arcgis.com/sharing/servers/88ae6caa9efc433fbfe4342dc7d7a21e/rest/services/GLDAS_Snowpack/ImageServer'
+        url: 'https://utilitydevext.arcgis.com/sharing/servers/e6a8c2b8b054467891ba3addd4dfe87f/rest/services/GLDAS_Snowpack/ImageServer'
     }
 };
