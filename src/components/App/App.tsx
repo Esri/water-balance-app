@@ -61,55 +61,86 @@ const App:React.FC<Props> = ({
 
     const [ isInfoModalOpen, setIsInfoModalOpen ] = React.useState<boolean>(false);
 
-    const shouldShowBottomPanel = ()=>{
-        return (gldasDataResponse && !isFailed && !isMobile );
-    }
+    // const shouldShowBottomPanel = ()=>{
+    //     return (gldasDataResponse && !isFailed && !isMobile );
+    // }
+
+    const shouldShowBottomPanel = React.useMemo(()=>{
+
+        if(isFailed || isMobile){
+            return false
+        }
+
+        if(isLoading || gldasDataResponse){
+            return true
+        }
+
+        return false
+
+    }, [gldasDataResponse, isLoading, isFailed, isMobile])
 
     const getBottomPanel = ()=>{
 
-        if(!shouldShowBottomPanel()){
+        if(!shouldShowBottomPanel){
             return null
         }
 
-        const { gldasData, gldasDataByMonth } = gldasDataResponse;
-     
-        return ( 
-            <BottomPanel
-                isLoading={isLoading}
-                isMobile={isMobile}
-            >
-                <ChangeInStorageIndicator 
-                    data={gldasData}
-                    gldasDataByMonth={gldasDataByMonth}
-                    timeExtentItem={previewTimeExtentItem || selectedTimeExtentItem}
-                />
+        if(isLoading){
+            return (
+                <BottomPanel
+                    isLoading={isLoading}
+                    isMobile={isMobile}
+                >
+                    <></>
+                </BottomPanel>
+            )
+        }
 
-                <SummaryCard 
-                    data={gldasData}
-                    gldasDataByMonth={gldasDataByMonth}
-                    timeExtentItem={previewTimeExtentItem || selectedTimeExtentItem}
-                />
+        if(gldasDataResponse){
+            
+            const { gldasData, gldasDataByMonth } = gldasDataResponse;
+        
+            return ( 
+                <BottomPanel
+                    isLoading={isLoading}
+                    isMobile={isMobile}
+                >
+                    <ChangeInStorageIndicator 
+                        data={gldasData}
+                        gldasDataByMonth={gldasDataByMonth}
+                        timeExtentItem={previewTimeExtentItem || selectedTimeExtentItem}
+                    />
 
-                <GldasChart 
-                    data={gldasData}
-                    timeExtent={timeExtentForGldasLayers}
-                    activeLayer={activeLayer}
-                    // activeTime={activeTime}
+                    <SummaryCard 
+                        data={gldasData}
+                        gldasDataByMonth={gldasDataByMonth}
+                        timeExtentItem={previewTimeExtentItem || selectedTimeExtentItem}
+                    />
 
-                    selectedTimeExtentItem={selectedTimeExtentItem}
-                    previewTimeExtentItem={previewTimeExtentItem}
+                    <GldasChart 
+                        data={gldasData}
+                        timeExtent={timeExtentForGldasLayers}
+                        activeLayer={activeLayer}
+                        // activeTime={activeTime}
 
-                    selectedItemOnChange={setSelectedTimeExtentItem}
-                    previewItemOnChange={setPreviewTimeExtentItem}
-                />
+                        selectedTimeExtentItem={selectedTimeExtentItem}
+                        previewTimeExtentItem={previewTimeExtentItem}
 
-                <MonthlyTrendChart 
-                    data={gldasDataByMonth}
-                    timeExtentItem={previewTimeExtentItem || selectedTimeExtentItem}
-                    activeLayer={activeLayer}
-                />
-            </BottomPanel>
-        );
+                        selectedItemOnChange={setSelectedTimeExtentItem}
+                        previewItemOnChange={setPreviewTimeExtentItem}
+                    />
+
+                    <MonthlyTrendChart 
+                        data={gldasDataByMonth}
+                        timeExtentItem={previewTimeExtentItem || selectedTimeExtentItem}
+                        activeLayer={activeLayer}
+                    />
+                </BottomPanel>
+            );
+        }
+
+        return null
+
     }
 
     React.useEffect(()=>{
@@ -136,7 +167,7 @@ const App:React.FC<Props> = ({
             />
 
             <MapView
-                paddingBottom={ shouldShowBottomPanel() ? UIConfig["bottom-panel-height"] : 0 }
+                paddingBottom={ shouldShowBottomPanel? UIConfig["bottom-panel-height"] : 0 }
                 onClickHandler={setQueryLocation}
             >
                 <GldasLayer 

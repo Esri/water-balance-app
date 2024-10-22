@@ -72,7 +72,12 @@ const LayerSwitcher:React.FC<Props> = ({
     }, [])
 
     return (
-        <StyledSelect>
+        <StyledSelect
+            style={{
+                '--calcite-color-foreground-1': UIConfig['theme-color-dark-blue'],
+                '--calcite-color-text-2': '#fff'
+            } as any}
+        >
             <calcite-select
                 ref={calciteSelectRef}
             >
