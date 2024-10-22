@@ -1,5 +1,5 @@
 import * as React from 'react';
-import Alert, { AlertTitle, AlertMessage } from 'calcite-react/Alert'
+// import Alert, { AlertTitle, AlertMessage } from 'calcite-react/Alert'
 import { UIConfig } from '../../AppConfig';
 
 interface Props {
@@ -12,6 +12,10 @@ const ErrorAlert:React.FC<Props> = ({
     onClose
 })=>{
 
+    if(!isVisible){
+        return null
+    }
+
     return isVisible ? (
         <div
             style={{
@@ -20,10 +24,14 @@ const ErrorAlert:React.FC<Props> = ({
                 'right': '1rem'
             }}
         >
-            <Alert red showIcon showCloseLabel onClose={onClose}>
+            {/* <Alert red showIcon showCloseLabel onClose={onClose}>
                 <AlertTitle>No Data Found!</AlertTitle>
                 <AlertMessage>Cannot find any GLDAS data for the selected location. Use a different location and try again.</AlertMessage>
-            </Alert>
+            </Alert> */}
+
+            <calcite-alert open label="A report alert" kind="danger">
+                <div slot="message">Failed to fetch GLDAS data for the selected location. Use a different location and try again.</div>
+            </calcite-alert>
         </div>
     ) : null;
 };

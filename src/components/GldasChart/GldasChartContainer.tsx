@@ -1,10 +1,9 @@
 import * as React from 'react';
-import styled from 'styled-components';
 import { max, min } from 'd3';
 
 import {
     GldasIdentifyTaskResults
-} from '../../services/GLDAS/gldas';
+} from '../../services/GLDAS/GLDAS';
 
 import {
     GldasLayerName
@@ -39,15 +38,13 @@ const ChartTypeLookup: {
     'Change in Storage': 'Change in Storage'
 };
 
-const GldasChartContainerDiv = styled.div`
-    position: relative;
-    /* max-width: 1000px; */
-    flex-grow: 1;
-    flex-shrink: 1;
-    /* flex-basis: 600px; */
-    flex: auto;
-    height: 100%;
-`;
+// const GldasChartContainerDiv = styled.div`
+//     position: relative;
+//     flex-grow: 1;
+//     flex-shrink: 1;
+//     flex: auto;
+//     height: 100%;
+// `;
 
 interface Props {
     data: GldasIdentifyTaskResults;
@@ -138,7 +135,15 @@ const GldasChartContainer:React.FC<Props> = ({
     };
 
     return (
-        <GldasChartContainerDiv>
+        <div
+            style={{
+                position: 'relative',
+                flexGrow: 1,
+                flexShrink: 1,
+                flex: 'auto',
+                height: '100%'
+            }}
+        >
 
             <Header 
                 activeLayer={activeLayer}
@@ -186,7 +191,7 @@ const GldasChartContainer:React.FC<Props> = ({
 
             </SvgContainer>
 
-        </GldasChartContainerDiv>
+        </div>
     );
 };
 

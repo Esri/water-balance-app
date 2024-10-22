@@ -3,7 +3,7 @@ import axios from 'axios';
 import { GldasLayersInfo, GldasLayersInfoDEV } from './config';
 import { GldasLayerName } from '../../types';
 
-import IPoint from 'esri/geometry/Point';
+import IPoint from '@arcgis/core/geometry/Point';
 
 export interface GldasIdentifyTaskResultItem {
     date: Date;
@@ -22,7 +22,7 @@ const GldasLayerNames = Object.keys(GldasLayersInfo) as GldasLayerName[];
 
 let timeExtentForGldasLayers:Date[] = [];
 
-const LayersInfo = location.host === 'livingatlasdev.arcgis.com' 
+const LayersInfo = location.host !== 'livingatlas.arcgis.com' 
     ? GldasLayersInfoDEV 
     : GldasLayersInfo;
 
@@ -67,30 +67,30 @@ export const getGLDASdata = async(queryLocation: IPoint):Promise<{
         await getTimeExtent();
     }
 
-    const params = {
-        geometry: {
-            x: queryLocation.longitude,
-            y: queryLocation.latitude,
-            spatialReference: {
-                wkid: 4326
-            }
-        }, //{"x":-9755306.160227587,"y":4549146.018149606,"spatialReference":{"wkid":102100}},
-        returnGeometry: 'false',
-        returnCatalogItems: 'true',
-        renderingRule: {"rasterFunction":"None"},
-        geometryType: 'esriGeometryPoint',
-        f: 'json'
-    };
-
     const identifyTasks = GldasLayerNames.map(layerName=>{
 
         const layerInfo = LayersInfo[layerName];
 
+        const params = new URLSearchParams({
+            geometry: JSON.stringify({
+                x: queryLocation.longitude,
+                y: queryLocation.latitude,
+                spatialReference: {
+                    wkid: 4326
+                }
+            }), //{"x":-9755306.160227587,"y":4549146.018149606,"spatialReference":{"wkid":102100}},
+            returnGeometry: 'false',
+            returnCatalogItems: 'true',
+            renderingRule: JSON.stringify({"rasterFunction":"None"}),
+            geometryType: 'esriGeometryPoint',
+            returnPixelValues: 'true',
+            processAsMultidimensional: 'false',
+            f: 'json',
+            mosaicRule: JSON.stringify(layerInfo.mosaicRule)
+        });
+
         return axios.get(layerInfo.url + '/identify', { 
-            params: {
-                ...params,
-                mosaicRule: layerInfo.mosaicRule
-            }
+            params
         });
     });
 

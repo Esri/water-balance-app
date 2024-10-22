@@ -2,9 +2,9 @@ const path = require('path');
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const TerserPlugin = require('terser-webpack-plugin');
-const OptimizeCSSAssets = require('optimize-css-assets-webpack-plugin');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
+// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 module.exports =  (env, options)=> {
 
@@ -17,7 +17,7 @@ module.exports =  (env, options)=> {
             filename: '[name].[contenthash].js',
             chunkFilename: '[name].[contenthash].js',
         },
-        devtool: devMode ? 'source-map' : 'none',
+        // devtool: devMode ? 'source-map' : 'none',
         resolve: {
             extensions: ['.js', '.jsx', '.json', '.ts', '.tsx']
         },
@@ -28,48 +28,40 @@ module.exports =  (env, options)=> {
                     loader: 'babel-loader'
                 },
                 {
-                    test: /\.s?[ac]ss$/,
+                    test: /\.css$/i,
+                    // include: path.resolve(__dirname, 'src'),
                     use: [
                         devMode ? 'style-loader' : MiniCssExtractPlugin.loader,
                         {
-                            loader: "css-loader", options: {
+                            loader: "css-loader", 
+                            options: {
                                 sourceMap: true
                             }
-                        }, {
-                            loader: 'resolve-url-loader',
-                        }, {
-                            loader: "sass-loader", options: {
-                                sourceMap: true
-                            }
+                        }, 
+                        {
+                            loader: 'postcss-loader'
                         }
-                    ]
+                    ],
                 },
-                { test: /\.woff$/, loader: "url-loader?limit=10000&mimetype=application/font-woff" },
-                { test: /\.ttf$/,  loader: "url-loader?limit=10000&mimetype=application/octet-stream" },
-                { test: /\.eot$/,  loader: "file-loader" },
                 { 
-                    test: /\.svg$/,  
-                    loader: "url-loader",
+                    test: /\.(woff|woff2|ttf|eot)$/,  
+                    loader: "file-loader",
                     options: {
-                        limit: 10000,
-                        fallback: {
-                            loader: "file-loader"
-                        }
+                        name: '[name].[contenthash].[ext]',
                     }
                 },
-                {   
-                    test: /\.(png|jpg|gif)$/,  
-                    loader: "url-loader",
+                { 
+                    test: /\.(png|jpg|gif|svg)$/,  
+                    loader: "file-loader",
                     options: {
-                        limit: 10000,
-                        fallback: {
-                            loader: "file-loader"
-                        }
+                        name: '[name].[contenthash].[ext]',
                     }
                 },
             ]
         },
         plugins: [
+            // need to use ForkTsCheckerWebpackPlugin because Babel loader ignores the compilation errors for Typescript
+            new ForkTsCheckerWebpackPlugin(),
             new MiniCssExtractPlugin({
                 // Options similar to the same options in webpackOptions.output
                 // both options are optional
@@ -94,24 +86,24 @@ module.exports =  (env, options)=> {
                     useShortDoctype                : true
                 }
             }),
-            new CleanWebpackPlugin(),
+            // new CleanWebpackPlugin(),
             // new BundleAnalyzerPlugin()
         ],
         optimization: {
-            splitChunks: {
-                cacheGroups: {
-                    default: false,
-                    vendors: false,
-                    // vendor chunk
-                    vendor: {
-                        // sync + async chunks
-                        chunks: 'all',
-                        name: 'vendor',
-                        // import file path containing node_modules
-                        test: /node_modules/
-                    }
-                }
-            },
+            // splitChunks: {
+            //     cacheGroups: {
+            //         default: false,
+            //         vendors: false,
+            //         // vendor chunk
+            //         vendor: {
+            //             // sync + async chunks
+            //             chunks: 'all',
+            //             name: 'vendor',
+            //             // import file path containing node_modules
+            //             test: /node_modules/
+            //         }
+            //     }
+            // },
             minimizer: [
                 new TerserPlugin({
                     extractComments: true,
@@ -121,7 +113,7 @@ module.exports =  (env, options)=> {
                         }
                     }
                 }), 
-                new OptimizeCSSAssets({})
+                new CssMinimizerPlugin()
             ]
         },
     }

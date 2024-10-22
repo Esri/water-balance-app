@@ -1,6 +1,6 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import Tooltip from 'calcite-react/Tooltip'
+// import Tooltip from 'calcite-react/Tooltip'
 
 import { GldasLayerName } from '../../types';
 
@@ -162,12 +162,12 @@ const Header:React.FC<Props> = ({
             <IntructionText>
                 <span className='font-size--3 narrow-hide'>{ InstructionTextContent }</span>
 
-                <Tooltip 
+                {/* <Tooltip 
                     title={InstructionTextContent}
                     placement={'top'}
                 >
                     <span className='icon-ui-question narrow-show'></span>
-                </Tooltip>
+                </Tooltip> */}
                 
             </IntructionText>
         </HeaderDiv>

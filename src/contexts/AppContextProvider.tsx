@@ -2,11 +2,11 @@ import * as React from 'react';
 
 import {
     getTimeExtent
-} from '../services/GLDAS/gldas';
+} from '../services/GLDAS/GLDAS';
 
 import {
-    miscFns
-} from 'helper-toolkit-ts';
+    isMobileDevice
+} from 'helper-toolkit-ts/dist/misc';
 
 interface AppContextProps {
     timeExtentForGldasLayers: Date[];
@@ -14,7 +14,7 @@ interface AppContextProps {
 }
 
 interface AppContextProviderProps {
-    // children: React.ReactNode;
+    children: React.ReactNode;
 };
 
 export const AppContext = React.createContext<AppContextProps>(null);
@@ -32,7 +32,7 @@ const AppContextProvider:React.FC<AppContextProviderProps> = ({
 
     const value = {
         timeExtentForGldasLayers,
-        isMobile: miscFns.isMobileDevice()
+        isMobile: isMobileDevice()
     };
 
     React.useEffect(()=>{

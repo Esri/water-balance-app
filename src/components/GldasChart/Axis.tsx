@@ -1,4 +1,4 @@
-import './Axis.scss';
+import './Axis.css';
 import * as React from 'react';
 import { 
     select,

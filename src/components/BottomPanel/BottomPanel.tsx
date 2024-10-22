@@ -1,6 +1,6 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import Loader from 'calcite-react/Loader'
+// import Loader from 'calcite-react/Loader'
 
 import {
     UIConfig
@@ -30,6 +30,7 @@ const LoaderDiv = styled.div`
 interface Props {
     isLoading?: boolean;
     isMobile?: boolean;
+    children: React.ReactNode;
 }
 
 const BottomPanel:React.FC<Props> = ({
@@ -41,9 +42,10 @@ const BottomPanel:React.FC<Props> = ({
     const getLoader = ()=>{
         return (
             <LoaderDiv>
-                <Loader 
+                {/* <Loader 
                     text='Loading...'
-                /> 
+                />  */}
+                <calcite-loader label="loading" />
             </LoaderDiv>
         );
     }
